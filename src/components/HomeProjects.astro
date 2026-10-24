@@ -1,0 +1,32 @@
+---
+import ProjectList from './projects/ProjectList.astro';
+import { featuredProjects } from '../lib/projects';
+
+const projects = await featuredProjects();
+---
+
+<section class="home-projects" aria-labelledby="made-title">
+  <h2 id="made-title">Things I've made</h2>
+  <ProjectList projects={projects} />
+  <p class="more">
+    <a href="/projects/">All projects</a>
+    <a href="/projects/#github">More on GitHub</a>
+  </p>
+</section>
+
+<style>
+  .home-projects {
+    margin-top: var(--space-4);
+  }
+
+  .more {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-4);
+    justify-content: flex-end;
+    margin-top: var(--space-2);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: var(--step-1);
+  }
+</style>

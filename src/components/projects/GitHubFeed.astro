@@ -1,0 +1,62 @@
+---
+import RepoItem from './RepoItem.astro';
+import { githubRepos, type Repo } from '../../lib/projects';
+import { site } from '../../data/site';
+
+const { current, earlier } = await githubRepos();
+const span = (repos: Repo[]) => {
+  const years = repos.map((r) => Number(r.pushedAt.slice(0, 4)));
+  return `${Math.min(...years)} to ${Math.max(...years)}`;
+};
+---
+
+<section class="feed" id="github" aria-labelledby="github-title">
+  <h2 id="github-title">More on GitHub</h2>
+  <p class="intro">
+    Everything else that's public on <a href={site.links.github}>GitHub</a>, most recently updated
+    first. The list refreshes each time the site builds.
+  </p>
+  {
+    current.length === 0 ? (
+      <p>Nothing else public right now.</p>
+    ) : (
+      <ul class="ruled">
+        {current.map((repo) => <RepoItem repo={repo} />)}
+      </ul>
+    )
+  }
+  {
+    earlier.length > 0 && (
+      <details class="earlier">
+        <summary>Earlier, {span(earlier)} ({earlier.length})</summary>
+        <ul class="ruled">
+          {earlier.map((repo) => <RepoItem repo={repo} />)}
+        </ul>
+      </details>
+    )
+  }
+</section>
+
+<style>
+  .feed {
+    margin-top: var(--space-5);
+  }
+
+  .intro {
+    max-width: var(--measure);
+  }
+
+  .earlier {
+    margin-top: var(--space-3);
+  }
+
+  .earlier summary {
+    min-height: 2.75rem;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: var(--step-1);
+  }
+</style>

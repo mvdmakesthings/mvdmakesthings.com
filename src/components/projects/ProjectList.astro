@@ -1,0 +1,15 @@
+---
+import ProjectEntry from './ProjectEntry.astro';
+import type { Project } from '../../lib/projects';
+
+interface Props {
+  projects: Project[];
+  level?: 2 | 3;
+}
+
+const { projects, level } = Astro.props;
+---
+
+<ul class="ruled">
+  {projects.map((project) => <ProjectEntry project={project} level={level} />)}
+</ul>

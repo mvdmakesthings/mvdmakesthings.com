@@ -1,0 +1,108 @@
+# Featured projects, in display order. See README.md, "Add a project".
+#
+# Fields
+#   slug      unique id, lowercase
+#   title     display name
+#   summary   one or two sentences
+#   stack     list of tools
+#   status    active | playtest | archived | client
+#   repo      GitHub repo name, so the "More on GitHub" feed doesn't list it twice (optional)
+#   links     any of: live, play, itch, source (all optional)
+#   image     file in src/assets/projects/ (optional; without one the entry gets a typographic cover)
+#   spec      longer text shown when the entry is expanded (optional)
+#
+# TODO(Michael): tighten the summaries, and add why you built each one and what
+# you learned to its spec. Specs below only state what the repos say.
+
+- slug: groundwerk
+  title: Groundwerk
+  summary: AI strategy tools for founders. Each one interviews you, pushes back on thin answers, and writes a document that has passed its own quality gates.
+  stack: [Python, FastAPI, LangGraph, React, Postgres, Vercel]
+  status: active
+  repo: groundwerk
+  links:
+    live: https://groundwerk.mvdmakesthings.com
+  image: groundwerk.png
+  spec: |
+    Two tools so far, brand strategy and business model, running on one engine.
+    Each is an agent that asks its questions, follows up when an answer is weak,
+    and writes a document that has to pass its own quality gates before you see it.
+    A FastAPI backend serves the agent graphs; the front end is React.
+
+- slug: plane-poultry-panic
+  title: Plane Poultry Panic
+  summary: A 16-bit top-down action game. Get through a chicken-overrun airport and catch the last flight out.
+  stack: [Godot 4, GDScript]
+  status: playtest
+  repo: plane-poultry-panic-play
+  links:
+    play: https://planepoultrypanic.mvdmakesthings.com
+    itch: https://mvdmakesthings.itch.io/plane-poultry-panic
+  image: plane-poultry-panic.png
+
+- slug: ephemeris
+  title: Ephemeris
+  summary: A Swift framework for satellite tracking. It parses Two-Line Element data and works out where Earth-orbiting satellites are.
+  stack: [Swift]
+  status: active
+  repo: Ephemeris
+  links:
+    source: https://github.com/mvdmakesthings/Ephemeris
+  spec: |
+    Built to do two jobs: a practical library for iOS and macOS apps that track
+    satellites, and a teaching tool for learning orbital mechanics by reading the code.
+
+- slug: mercator
+  title: Mercator
+  summary: A Tree-sitter toolkit that turns source repositories into code quality metrics and maps of their structure.
+  stack: [Python, Tree-sitter, Pydantic]
+  status: active
+  repo: mercator
+  links:
+    source: https://github.com/mvdmakesthings/mercator
+  spec: |
+    Parses C#, JavaScript, TypeScript, Python, and Ruby into syntax trees, then
+    measures them: more than 80 metrics, from cyclomatic complexity to coupling,
+    plus dependency graphs, documentation coverage, and code smells. Runs as a CLI
+    or a Python module, in parallel, and skips files it has already analyzed.
+
+- slug: compass
+  title: Compass
+  summary: A strategic rhythm tool for engineering leaders who have to set their own priorities. Monday triage, daily check-ins, and a Friday retro.
+  stack: [TypeScript]
+  status: active
+  repo: compass
+
+- slug: coopcam
+  title: CoopCam
+  summary: A two-device bird camera. It photographs birds at the feeder, identifies them on the device, and sends the result to a touchscreen over ESP-NOW, no router needed.
+  stack: [ESP32-S3, PlatformIO, TFLite Micro, LVGL]
+  status: active
+  repo: coopcam
+  links:
+    source: https://github.com/mvdmakesthings/coopcam
+  spec: |
+    "I wanna identify birds at the bird feeder, remotely." The camera unit is a
+    XIAO ESP32S3 Sense running a TensorFlow Lite Micro classifier; the display is a
+    SenseCAP Indicator with a 4-inch touchscreen. Both firmwares build from one
+    PlatformIO config.
+
+- slug: moler-mosaic
+  title: Moler Mosaic
+  summary: Print large artwork on a standard office printer. It slices an image into letter-size pages with registration marks, right in the browser.
+  stack: [JavaScript, HTML, CSS]
+  status: active
+  repo: moler-mosaic
+  links:
+    live: https://mvdmakesthings.github.io/moler-mosaic/
+    source: https://github.com/mvdmakesthings/moler-mosaic
+  image: moler-mosaic.png
+
+- slug: skills
+  title: Skills
+  summary: A curated set of Claude Code plugins that add structured workflows to AI sessions, from planning and QA to time tracking and prose rewriting.
+  stack: [Claude Code, Python, Shell]
+  status: active
+  repo: skills
+  links:
+    source: https://github.com/mvdmakesthings/skills

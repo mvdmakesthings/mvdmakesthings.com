@@ -1,8 +1,21 @@
 ---
 import Base from '../layouts/Base.astro';
+import ProjectList from '../components/projects/ProjectList.astro';
+import GitHubFeed from '../components/projects/GitHubFeed.astro';
+import { featuredProjects } from '../lib/projects';
+
+const projects = await featuredProjects();
 ---
 
-<Base title="Projects" sheet="Projects" description="Software, games, and hardware Michael VanDyke has built.">
+<Base
+  title="Projects"
+  sheet="Projects"
+  description="Software, games, and hardware built by Michael VanDyke: AI tools, a Godot game, a satellite tracking framework, an embedded bird camera, and more."
+>
   <h1 class="page-title">Projects</h1>
-  <p class="lede">Software, games, and hardware I've built. The catalog is on the bench and goes up next.</p>
+  <p class="lede">
+    Software, games, and hardware I've built. Open a spec sheet for the details.
+  </p>
+  <ProjectList projects={projects} level={2} />
+  <GitHubFeed />
 </Base>

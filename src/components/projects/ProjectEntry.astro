@@ -1,0 +1,205 @@
+---
+import { Image } from 'astro:assets';
+import ProjectCover from './ProjectCover.astro';
+import { linkLabels, projectImage, statusLabel, type Project } from '../../lib/projects';
+
+interface Props {
+  project: Project;
+  /** Heading level for the project name. */
+  level?: 2 | 3;
+}
+
+const { project, level = 3 } = Astro.props;
+const Heading = `h${level}` as const;
+const image = projectImage(project.image);
+const links = (Object.keys(linkLabels) as (keyof typeof linkLabels)[])
+  .filter((key) => project.links[key])
+  .map((key) => ({ href: project.links[key]!, label: linkLabels[key] }));
+---
+
+<li class="entry" id={project.slug}>
+  <div class:list={["thumb", { cover: !image }]}>
+    {
+      image ? (
+        <Image src={image} alt="" widths={[240, 480]} sizes="(min-width: 48rem) 15rem, 7rem" loading="lazy" />
+      ) : (
+        <ProjectCover title={project.title} language={project.stack[0]} />
+      )
+    }
+  </div>
+  <div class="body">
+    <Heading class="name">{project.title}</Heading>
+    <p class="summary">{project.summary}</p>
+    <p class="meta">
+      <span>{project.stack.join(', ')}</span>
+      <span class="status">{statusLabel[project.status]}</span>
+    </p>
+    {
+      links.length > 0 && (
+        <ul class="links" aria-label={`${project.title} links`}>
+          {links.map((link) => (
+            <li>
+              <a href={link.href}>{link.label}</a>
+            </li>
+          ))}
+        </ul>
+      )
+    }
+    {
+      project.spec && (
+        <details class="spec">
+          <summary>Spec sheet</summary>
+          <div class="sheet-panel kraft">
+            {project.spec.trim().split(/\n\s*\n/).map((para) => <p>{para}</p>)}
+          </div>
+        </details>
+      )
+    }
+  </div>
+</li>
+
+<style>
+  /* Phones: the thumbnail sits beside the name and everything else runs full width. */
+  .entry {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 6.5rem;
+    column-gap: var(--space-2);
+    align-items: start;
+    padding: var(--space-3) 0;
+  }
+
+  .thumb {
+    grid-column: 2;
+    grid-row: 1;
+    margin-bottom: var(--space-1);
+  }
+
+  /* A cover beside the name would only repeat it. */
+  .thumb.cover {
+    display: none;
+  }
+
+  .body {
+    display: contents;
+  }
+
+  .body > * {
+    grid-column: 1 / -1;
+  }
+
+  .body > .name {
+    grid-column: 1;
+    grid-row: 1;
+    align-self: center;
+  }
+
+  .thumb :global(img) {
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    object-position: top;
+    border: 1px solid var(--ink);
+  }
+
+  .name {
+    font-size: var(--step-3);
+    margin-bottom: var(--space-1);
+  }
+
+  .summary {
+    max-width: 58ch;
+    margin-bottom: var(--space-1);
+  }
+
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 var(--space-2);
+    margin-bottom: var(--space-1);
+  }
+
+  .status {
+    color: var(--teal);
+  }
+
+  .links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 var(--space-3);
+  }
+
+  .links a {
+    display: inline-block;
+    padding: 0.3rem 0;
+  }
+
+  .spec {
+    margin-top: var(--space-1);
+  }
+
+  .spec summary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    min-height: 2.75rem;
+    cursor: pointer;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: var(--step-0);
+    letter-spacing: 0.01em;
+    list-style: none;
+  }
+
+  .spec summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .spec summary::before {
+    content: '+';
+    display: inline-grid;
+    place-items: center;
+    width: 1.1rem;
+    height: 1.1rem;
+    border: 1px solid var(--ink);
+    font-family: var(--font-body);
+    line-height: 1;
+  }
+
+  .spec[open] summary::before {
+    content: '\2212';
+  }
+
+  .sheet-panel {
+    padding: var(--space-2);
+    border: 1px solid var(--ink);
+    max-width: 62ch;
+  }
+
+  .sheet-panel p:last-child {
+    margin-bottom: 0;
+  }
+
+  @media (min-width: 48rem) {
+    .entry {
+      grid-template-columns: 15rem minmax(0, 1fr);
+      column-gap: var(--space-3);
+    }
+
+    .thumb,
+    .thumb.cover {
+      display: block;
+      grid-column: 1;
+      margin: 0;
+    }
+
+    .body {
+      display: block;
+      grid-column: 2;
+      grid-row: 1;
+      min-width: 0;
+    }
+  }
+</style>
