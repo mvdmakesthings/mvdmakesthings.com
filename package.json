@@ -7,9 +7,11 @@
   },
   "scripts": {
     "dev": "astro dev",
+    "prebuild": "node scripts/fetch-github.ts",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "github:fetch": "node scripts/fetch-github.ts"
   },
   "dependencies": {
     "@astrojs/mdx": "^8.1.1",
