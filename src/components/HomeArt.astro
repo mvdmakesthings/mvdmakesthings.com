@@ -1,0 +1,22 @@
+---
+import Gallery from './art/Gallery.astro';
+import { pieces } from '../lib/art';
+
+const latest = (await pieces()).slice(0, 3);
+---
+
+<section class="home-art" aria-labelledby="art-title">
+  <h2 id="art-title">Art</h2>
+  <p>Painting, sculpture, woodwork, and pieces you can play with.</p>
+  {latest.length > 0 && <Gallery pieces={latest} preview />}
+  <p class="more"><a href="/art/">The gallery</a></p>
+</section>
+
+<style>
+  .more {
+    margin-top: var(--space-2);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: var(--step-1);
+  }
+</style>

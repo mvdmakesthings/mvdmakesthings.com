@@ -3,6 +3,8 @@ import Base from '../layouts/Base.astro';
 import Hero from '../components/Hero.astro';
 import HomeProjects from '../components/HomeProjects.astro';
 import HomeWriting from '../components/HomeWriting.astro';
+import HomeArt from '../components/HomeArt.astro';
+import Bio from '../components/Bio.astro';
 ---
 
 <Base sheet="Home">
@@ -10,7 +12,9 @@ import HomeWriting from '../components/HomeWriting.astro';
   <HomeProjects />
   <div class="pair">
     <HomeWriting />
+    <HomeArt />
   </div>
+  <Bio />
 </Base>
 
 <style>
