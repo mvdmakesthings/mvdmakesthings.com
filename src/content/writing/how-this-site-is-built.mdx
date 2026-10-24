@@ -1,0 +1,103 @@
+---
+title: How this site is built
+description: A remote control you can take apart, one CSS variable, and a handful of files I can edit without touching a component.
+pubDate: 2026-10-24
+tags: [colophon, astro, css, svg]
+---
+
+As a kid I took apart remote controls to see the circuits. So the front page of this
+site is a drawing of a remote control, and you can take it apart.
+
+That's the whole gimmick. Everything else here is meant to be a quiet catalog of
+things I've made. This post is the colophon: how the remote works, what the site runs
+on, and which files I edit when something changes. Steal anything that's useful.
+
+## The teardown
+
+The drawing on the home page is an exploded view, the kind you find in a service
+manual or an old tool catalog: top shell, rubber keypad, circuit board with its IR LED,
+two AA batteries, bottom shell, battery door. Move your pointer across it and the
+parts come apart. On a phone, scrolling does the same job. Resize the window and it
+twitches.
+
+There's no 3D library behind it. The remote is a few dozen flat outlines (rounded
+rectangles, circles, the cross-section of a battery) described in millimetres and run
+through a tiny axonometric projection when the site builds. Each outline becomes SVG
+path data, and the convex hull of a part's top and bottom outlines becomes its side
+wall. The browser only ever sees finished, static SVG, about 29 KB of it.
+
+## One number
+
+Every part is a `<g>` with its own offset. One CSS custom property, `--explode`, runs
+from 0 (assembled) to 1 (fully apart), and every part's transform is written in terms
+of it:
+
+```css
+.teardown .part {
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: translateY(calc(var(--explode) * var(--dy) * 1px))
+    rotate(calc(var(--explode) * var(--rot) * 1deg));
+}
+
+/* Callouts and the dash-dot assembly lines fade in as the parts separate. */
+.teardown {
+  --labels: clamp(0, calc((var(--explode) - 0.4) * 4), 1);
+}
+```
+
+The script's only job is to decide what that number should be. The pointer's position
+across the hero sets a target on desktop; scroll progress sets it on touch screens; a
+resize adds a nudge that decays. Each animation frame eases the current value toward
+the target and stops when it gets there. When the page loads, the remote assembles
+itself once, over 900 milliseconds. That's the only thing on the site that moves
+without being asked.
+
+If your system asks for reduced motion, none of that runs. The drawing sits still,
+partly apart, with every label showing.
+
+The power button is a real `<button>` laid over the drawing. Press it and the site
+switches between light and dark, and the IR LED blinks once. The ordinary toggle in
+the header does the same thing, for people who'd rather not press buttons on a drawing.
+
+## The stack
+
+- [Astro](https://astro.build), building a fully static site. No framework components;
+  the little interactivity there is lives in plain TypeScript.
+- Plain CSS with custom properties. The colors come from a photo of me: vellum white
+  and true black for paper and ink, copper from a shirt, teal from the lights behind
+  me, kraft from a cap.
+- Big Shoulders Display for headings, Newsreader for reading, JetBrains Mono for code,
+  all self-hosted.
+- Vercel for hosting, with its privacy-friendly analytics.
+
+The footer is a title block, like the one in the corner of an engineering drawing. It
+says which sheet you're on and when the site was last built.
+
+## The files I actually edit
+
+Content lives in data files, so adding something never means opening a component:
+
+- `src/data/projects.yaml` holds the featured projects, in order. Everything else that's
+  public on my GitHub shows up below them, pulled from the GitHub API each time the
+  site builds. The last good response is committed, so a GitHub outage can't break a
+  deploy.
+- `src/content/writing/` holds posts like this one, one MDX file each.
+- `src/content/art/` holds one small YAML file per piece in the gallery, next to the
+  images in `public/art/`.
+- `src/data/resume.yaml` is the whole resume. The page renders it, a print stylesheet
+  makes it presentable on paper, and a local script turns it into a PDF.
+
+## What to steal
+
+- **One number, many outputs.** If an interaction can be described as a single
+  progress value, put that value in a custom property and let CSS do the rest. The
+  JavaScript stays small and the styling stays in the stylesheet.
+- **Draw at build time.** Geometry you'd compute in the browser can often be computed
+  once by the build. The visitor downloads the answer, not the math.
+- **Cache what you fetch.** Anything a build pulls from an API can be committed as a
+  file, so the build degrades to "slightly stale" instead of "broken."
+- **Spend the boldness once.** One playful thing on the front page, and a calm, readable
+  catalog everywhere else.
+
+The source is [on GitHub](https://github.com/mvdmakesthings/mvdmakesthings.com).
