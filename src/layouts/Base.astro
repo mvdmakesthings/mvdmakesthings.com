@@ -5,6 +5,7 @@ import Analytics from '@vercel/analytics/astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import { site } from '../data/site';
+import { ogImagePath } from '../lib/og';
 import '../styles/global.css';
 
 interface Props {
@@ -27,8 +28,10 @@ const {
   title,
   description = site.description,
   sheet,
-  image = '/og.jpg',
-  imageAlt = 'Michael VanDyke beside the headline: I take things apart to see how they work. Then I make new ones.',
+  image = ogImagePath(Astro.url.pathname),
+  imageAlt = title
+    ? `${title}, on a drafting sheet from ${site.title}`
+    : 'Michael VanDyke beside the headline: I take things apart to see how they work. Then I make new ones.',
   type = 'website',
   published,
   modified,

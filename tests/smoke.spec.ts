@@ -154,3 +154,20 @@ for (const path of pages) {
     });
   }
 }
+
+for (const path of pages) {
+  test(`${path} links a social preview image that exists`, async ({ page, request }) => {
+    await page.goto(path);
+    const image = await page.locator('meta[property="og:image"]').getAttribute('content');
+    // og:image is absolute on the production host; fetch the same path from the preview server.
+    const response = await request.get(new URL(image!).pathname);
+    expect(response.status()).toBe(200);
+    expect(response.headers()['content-type']).toMatch(/^image\//);
+  });
+}
+
+test('the 404 page stays out of search results', async ({ page }) => {
+  await page.goto('/404/');
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex');
+  await expect(page.locator('link[rel="canonical"]')).toHaveCount(0);
+});
