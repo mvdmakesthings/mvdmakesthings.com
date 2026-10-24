@@ -21,7 +21,7 @@ const plain = (url: string) => url.replace(/^https?:\/\/(www\.)?/, '').replace(/
 ---
 
 <Base
-  title="Resume"
+  title={`${resume.name}: Resume`}
   sheet="Resume"
   description={`${resume.name}: ${resume.title} Engineering leadership, modernization, and hands-on building in ${resume.location}.`}
 >
