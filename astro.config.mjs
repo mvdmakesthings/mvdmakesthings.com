@@ -10,6 +10,14 @@ export default defineConfig({
   site: 'https://mvdmakesthings.com',
   trailingSlash: 'ignore',
   integrations: [mdx(), sitemap()],
+  markdown: {
+    shikiConfig: {
+      // Both themes are emitted as CSS variables; global.css picks one per site theme.
+      themes: { light: 'github-light', dark: 'github-dark-default' },
+      defaultColor: false,
+      wrap: false,
+    },
+  },
   fonts: [
     {
       provider: fontProviders.local(),

@@ -1,5 +1,5 @@
 import { defineCollection } from 'astro:content';
-import { file } from 'astro/loaders';
+import { file, glob } from 'astro/loaders';
 import { z } from 'astro/zod';
 import { parse } from 'yaml';
 
@@ -30,4 +30,16 @@ const projects = defineCollection({
   }),
 });
 
-export const collections = { projects };
+const writing = defineCollection({
+  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/writing' }),
+  schema: z.object({
+    title: z.string(),
+    description: z.string(),
+    pubDate: z.coerce.date(),
+    updatedDate: z.coerce.date().optional(),
+    tags: z.array(z.string()).default([]),
+    draft: z.boolean().default(false),
+  }),
+});
+
+export const collections = { projects, writing };

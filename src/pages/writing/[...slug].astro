@@ -1,0 +1,94 @@
+---
+import { render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import { formatDate, posts, type Post } from '../../lib/writing';
+
+export async function getStaticPaths() {
+  return (await posts()).map((post) => ({ params: { slug: post.id }, props: { post } }));
+}
+
+const { post } = Astro.props as { post: Post };
+const { Content } = await render(post);
+const { title, description, pubDate, updatedDate } = post.data;
+const iso = (date: Date) => date.toISOString().slice(0, 10);
+---
+
+<Base title={title} sheet="Writing" description={description} type="article">
+  <article class="post">
+    <header>
+      <p class="meta">
+        <a href="/writing/">Writing</a>
+        <span aria-hidden="true">/</span>
+        <time datetime={iso(pubDate)}>{formatDate(pubDate)}</time>
+        {
+          updatedDate && (
+            <>
+              <span aria-hidden="true">/</span>
+              <span>
+                Updated <time datetime={iso(updatedDate)}>{formatDate(updatedDate)}</time>
+              </span>
+            </>
+          )
+        }
+      </p>
+      <h1>{title}</h1>
+      <p class="lede">{description}</p>
+    </header>
+    <div class="prose">
+      <Content />
+    </div>
+  </article>
+</Base>
+
+<style>
+  .post header {
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-3);
+    border-bottom: 1px solid var(--ink);
+  }
+
+  .post .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 0.5rem;
+  }
+
+  h1 {
+    font-size: clamp(var(--step-4), 7vw, var(--step-6));
+    max-width: 18ch;
+  }
+
+  .lede {
+    max-width: 48ch;
+  }
+
+  .prose :global(h2) {
+    font-size: var(--step-3);
+    margin-top: var(--space-4);
+  }
+
+  .prose :global(h3) {
+    font-size: var(--step-2);
+    margin-top: var(--space-3);
+  }
+
+  .prose :global(pre) {
+    margin: var(--space-3) 0;
+  }
+
+  .prose :global(img) {
+    margin: var(--space-3) 0;
+    height: auto;
+  }
+
+  .prose :global(blockquote) {
+    margin-left: 0;
+    padding-left: var(--space-2);
+    border-left: 2px solid var(--copper);
+    font-style: italic;
+  }
+
+  .prose :global(li + li) {
+    margin-top: 0.3rem;
+  }
+</style>

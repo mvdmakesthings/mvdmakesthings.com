@@ -1,0 +1,56 @@
+---
+import { formatDate, postUrl, type Post } from '../../lib/writing';
+
+interface Props {
+  posts: Post[];
+  level?: 2 | 3;
+}
+
+const { posts, level = 2 } = Astro.props;
+const Heading = `h${level}` as const;
+---
+
+{
+  posts.length === 0 ? (
+    <p>No posts yet. The first one is on its way.</p>
+  ) : (
+    <ul class="ruled">
+      {posts.map((post) => (
+        <li class="post">
+          <Heading class="title">
+            <a href={postUrl(post)}>{post.data.title}</a>
+          </Heading>
+          <p class="meta">
+            <time datetime={post.data.pubDate.toISOString().slice(0, 10)}>{formatDate(post.data.pubDate)}</time>
+          </p>
+          <p class="desc">{post.data.description}</p>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+<style>
+  .post {
+    padding: var(--space-2) 0;
+  }
+
+  .title {
+    font-size: var(--step-2);
+    margin-bottom: 0.25rem;
+  }
+
+  .title a {
+    color: var(--ink);
+    text-decoration-color: var(--copper);
+  }
+
+  .meta {
+    margin-bottom: 0.25rem;
+  }
+
+  .desc {
+    max-width: var(--measure);
+    margin: 0;
+  }
+</style>

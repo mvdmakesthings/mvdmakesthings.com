@@ -1,0 +1,21 @@
+---
+import PostList from './writing/PostList.astro';
+import { posts } from '../lib/writing';
+
+const latest = (await posts()).slice(0, 3);
+---
+
+<section class="home-writing" aria-labelledby="writing-title">
+  <h2 id="writing-title">Writing</h2>
+  <PostList posts={latest} level={3} />
+  <p class="more"><a href="/writing/">All writing</a></p>
+</section>
+
+<style>
+  .more {
+    margin-top: var(--space-2);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: var(--step-1);
+  }
+</style>

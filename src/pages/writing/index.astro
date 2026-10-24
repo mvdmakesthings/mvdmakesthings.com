@@ -1,0 +1,13 @@
+---
+import Base from '../../layouts/Base.astro';
+import PostList from '../../components/writing/PostList.astro';
+import { posts } from '../../lib/writing';
+
+const all = await posts();
+---
+
+<Base title="Writing" sheet="Writing" description="Notes from Michael VanDyke on building things: software, hardware, and the shop.">
+  <h1 class="page-title">Writing</h1>
+  <p class="lede">Notes on how things are built. <a href="/rss.xml">Subscribe by RSS</a>.</p>
+  <PostList posts={all} />
+</Base>
