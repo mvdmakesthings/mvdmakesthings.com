@@ -1,4 +1,5 @@
 ---
+import { site } from '../data/site';
 import ProjectList from './projects/ProjectList.astro';
 import { featuredProjects } from '../lib/projects';
 
@@ -10,7 +11,7 @@ const projects = await featuredProjects();
   <ProjectList projects={projects} />
   <p class="more">
     <a href="/projects/">All projects</a>
-    <a href="/projects/#github">More on GitHub</a>
+    <a href={site.links.github}>Everything else on GitHub</a>
   </p>
 </section>
 

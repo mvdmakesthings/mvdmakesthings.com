@@ -16,7 +16,6 @@ const projects = defineCollection({
     summary: z.string(),
     stack: z.array(z.string()).default([]),
     status: z.enum(['active', 'playtest', 'archived', 'client']),
-    repo: z.string().optional(),
     links: z
       .object({
         live: z.url().optional(),

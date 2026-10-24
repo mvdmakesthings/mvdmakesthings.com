@@ -7,11 +7,9 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "prebuild": "node scripts/fetch-github.ts",
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "github:fetch": "node scripts/fetch-github.ts",
     "thumbnails": "node scripts/capture-thumbnails.ts",
     "resume:pdf": "node scripts/resume-pdf.ts",
     "test": "playwright test"

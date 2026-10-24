@@ -17,12 +17,11 @@ Needs Node 24 and pnpm (`corepack enable` picks up the pinned version).
 |---|---|
 | `pnpm install` | Install dependencies |
 | `pnpm dev` | Local dev server at http://localhost:4321 (drafts and resume TODOs visible) |
-| `pnpm build` | Refresh the GitHub feed, then build the site into `dist/` |
+| `pnpm build` | Build the site into `dist/` |
 | `pnpm preview` | Serve the built site |
 | `pnpm test` | Build, then run the Playwright smoke and accessibility tests |
 | `pnpm resume:pdf` | Build, then print `/resume/` to `public/resume.pdf` |
 | `pnpm thumbnails` | Re-capture project screenshots from their live sites |
-| `pnpm github:fetch` | Refresh `src/data/github.json` on its own |
 
 The first `pnpm test` or `pnpm resume:pdf` may need a browser: `pnpm exec playwright install chromium`.
 
@@ -38,8 +37,9 @@ Everything you'd normally change lives in a data file. No components need touchi
 
 ### Add or change a project
 
-Edit `src/data/projects.yaml`. Entries appear in file order, on the home page and on
-`/projects/`.
+Edit `src/data/projects.yaml`. Only the projects listed there appear on the site, in file
+order, on the home page and on `/projects/`. Both pages link to the GitHub profile for
+everything else; nothing is pulled from GitHub automatically.
 
 ```yaml
 - slug: my-thing               # unique, lowercase
@@ -47,7 +47,6 @@ Edit `src/data/projects.yaml`. Entries appear in file order, on the home page an
   summary: One or two sentences.
   stack: [Python, ESP32]
   status: active               # active | playtest | archived | client
-  repo: my-thing               # GitHub repo name, so the feed doesn't list it twice
   links:                       # any of: live, play, itch, source
     live: https://example.com
     source: https://github.com/mvdmakesthings/my-thing
@@ -60,16 +59,6 @@ Edit `src/data/projects.yaml`. Entries appear in file order, on the home page an
   run `pnpm thumbnails my-thing` to screenshot it at 1200×750. Or drop any 16:10 image into
   `src/assets/projects/`. Without an `image`, the entry gets a typographic cover.
 - **Private repos:** leave out `source`, since visitors would get a 404.
-
-### The "More on GitHub" feed
-
-Every build fetches the public repos for `mvdmakesthings` and writes
-`src/data/github.json`. If GitHub is unreachable, the build warns and uses the committed
-copy, so commit that file now and then. Set `GITHUB_TOKEN` for a higher rate limit.
-
-- Hide a repo: add its name to `src/data/github-exclude.ts`.
-- Featured projects drop out of the feed automatically through their `repo` field.
-- Archived repos collapse under "Earlier".
 
 ### Write a post
 
@@ -146,11 +135,11 @@ is public, so put nothing in the file you wouldn't put on LinkedIn.
 ```
 assets/bio-photo.jpg           bio photo (the OG image and touch icon are crops of it)
 public/                        favicon, og.jpg, robots.txt, resume.pdf
-scripts/                       fetch-github.ts, capture-thumbnails.ts, resume-pdf.ts
+scripts/                       capture-thumbnails.ts, resume-pdf.ts
 src/content.config.ts          schemas for projects, writing, and art
 src/content/writing/           posts
 src/content/art/               gallery pieces (YAML + image)
-src/data/                      site.ts, projects.yaml, resume.yaml, github.json, github-exclude.ts
+src/data/                      site.ts, projects.yaml, resume.yaml
 src/components/Teardown.astro  the remote: geometry, interaction script, styles
 src/lib/axo.ts                 the build-time axonometric drawing helpers
 src/styles/tokens.css          colors, type scale, spacing

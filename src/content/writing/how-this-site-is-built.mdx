@@ -78,10 +78,8 @@ says which sheet you're on and when the site was last built.
 
 Content lives in data files, so adding something never means opening a component:
 
-- `src/data/projects.yaml` holds the featured projects, in order. Everything else that's
-  public on my GitHub shows up below them, pulled from the GitHub API each time the
-  site builds. The last good response is committed, so a GitHub outage can't break a
-  deploy.
+- `src/data/projects.yaml` holds the projects, in order. It's a short list on purpose:
+  the handful I'd point you to first. Everything else is on GitHub.
 - `src/content/writing/` holds posts like this one, one MDX file each.
 - `src/content/art/` holds one small YAML file per piece in the gallery, with the
   photo beside it so the build can resize it.
@@ -95,8 +93,6 @@ Content lives in data files, so adding something never means opening a component
   JavaScript stays small and the styling stays in the stylesheet.
 - **Draw at build time.** Geometry you'd compute in the browser can often be computed
   once by the build. The visitor downloads the answer, not the math.
-- **Cache what you fetch.** Anything a build pulls from an API can be committed as a
-  file, so the build degrades to "slightly stale" instead of "broken."
 - **Spend the boldness once.** One playful thing on the front page, and a calm, readable
   catalog everywhere else.
 

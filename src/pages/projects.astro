@@ -1,8 +1,8 @@
 ---
 import Base from '../layouts/Base.astro';
 import ProjectList from '../components/projects/ProjectList.astro';
-import GitHubFeed from '../components/projects/GitHubFeed.astro';
 import { featuredProjects } from '../lib/projects';
+import { site } from '../data/site';
 
 const projects = await featuredProjects();
 ---
@@ -17,5 +17,15 @@ const projects = await featuredProjects();
     Software, games, and hardware I've built. Open a spec sheet for the details.
   </p>
   <ProjectList projects={projects} level={2} />
-  <GitHubFeed />
+  <p class="elsewhere">
+    These are the ones I'd point you to first. Smaller experiments and older work are
+    on <a href={site.links.github}>GitHub</a>.
+  </p>
 </Base>
+
+<style>
+  .elsewhere {
+    max-width: var(--measure);
+    margin-top: var(--space-4);
+  }
+</style>
