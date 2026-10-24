@@ -1,5 +1,9 @@
 import { expect, test, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { readFileSync } from 'node:fs';
+import { parse } from 'yaml';
+
+const featuredCount = (parse(readFileSync('src/data/projects.yaml', 'utf8')) as unknown[]).length;
 
 const pages = ['/', '/projects/', '/writing/', '/writing/how-this-site-is-built/', '/art/', '/resume/', '/404/'];
 
@@ -10,7 +14,7 @@ test('home renders the hero and the catalog', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByRole('heading', { level: 1 })).toContainText('I take things apart');
   await expect(page.getByRole('img', { name: /Exploded view of a TV remote/ })).toBeVisible();
-  await expect(page.locator('#made-title + ul > li')).toHaveCount(8);
+  await expect(page.locator('#made-title + ul > li')).toHaveCount(featuredCount);
   await expect(page.getByRole('link', { name: 'Work with me' }).first()).toHaveAttribute('href', '/resume/');
 });
 
