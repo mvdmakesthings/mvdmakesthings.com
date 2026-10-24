@@ -1,0 +1,14 @@
+title: alluvium.
+medium: Electronic music
+caption: >-
+  I produce electronic music as alluvium. It's a hobby: I like learning new
+  techniques and trying out different genres. These are my latest tracks.
+image: ./alluvium.jpg
+alt: The alluvium. artwork, a black hole ringed by stars.
+order: 3
+media:
+  - kind: soundcloud
+    url: https://soundcloud.com/alluvium_music
+    title: alluvium. on SoundCloud
+    poster: ./alluvium.jpg
+    alt: The alluvium. artwork, a black hole ringed by stars.

@@ -7,7 +7,7 @@ const latest = (await pieces()).slice(0, 3);
 
 <section class="home-art" aria-labelledby="art-title">
   <h2 id="art-title">Art</h2>
-  <p>Painting, sculpture, woodwork, and pieces you can play with.</p>
+  <p>Installations, generative art, and music.</p>
   {latest.length > 0 && <Gallery pieces={latest} preview />}
   <p class="more"><a href="/art/">The gallery</a></p>
 </section>

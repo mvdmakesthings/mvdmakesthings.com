@@ -83,16 +83,16 @@ Posts show up on `/writing/`, in the latest three on the home page, and in `/rss
 
 ### Add an art piece
 
-Each piece is one image plus one YAML file, side by side in `src/content/art/`.
+Each piece is one YAML file in `src/content/art/`, with its images beside it.
 
-1. Put the photo in `src/content/art/`, for example `src/content/art/river-study.jpg`. Any
-   size is fine; the build makes resized copies.
+1. Put a still in `src/content/art/`, for example `river-study.jpg`. Any size works; the
+   build makes resized copies. Gallery cards crop to 4:5; the lightbox shows the whole image.
 2. Add `src/content/art/river-study.yaml`:
 
    ```yaml
    title: River study
    medium: Acrylic on panel
-   year: 2025
+   year: 2025                  # optional
    dimensions: 24 × 30 in      # optional
    caption: A sentence or two about the piece.
    image: ./river-study.jpg
@@ -100,11 +100,23 @@ Each piece is one image plus one YAML file, side by side in `src/content/art/`.
    order: 1                    # optional; lower numbers first, then newest year
    ```
 
-**Replacing the placeholders:** the gallery ships with three stand-ins named
-`PLACEHOLDER-1` to `PLACEHOLDER-3` (an `.svg` and a `.yaml` each). To swap one for a real
-piece, delete its two files and add your own pair under your own name. While any entry
-named `PLACEHOLDER-*` remains, the gallery shows a note pointing to Instagram; the note
-disappears on its own once they're gone.
+**Video and audio.** Add a `media` list to show Instagram reels or SoundCloud in the
+lightbox. The visitor sees a still and a Play button; the provider's player loads only
+after they press it, so Instagram and SoundCloud see nothing from a visit until then.
+
+```yaml
+media:
+  - kind: instagram            # instagram | soundcloud
+    url: https://www.instagram.com/reel/C6mTpDxOdMq/   # share links are fine; tracking parameters are dropped
+    title: Hello, Hun           # optional; names the clip when there are several
+    poster: ./hello-hun-1.jpg   # optional still for this clip; defaults to the piece's image
+    alt: What the still shows.  # optional
+  - kind: soundcloud
+    url: https://soundcloud.com/alluvium_music   # a profile, a track, or a playlist
+```
+
+A piece with several clips lists them in the lightbox so visitors can switch between
+them. `hello-hun.yaml`, `moondew.yaml`, and `alluvium.yaml` are working examples.
 
 ### Update the resume
 

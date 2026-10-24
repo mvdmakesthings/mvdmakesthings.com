@@ -1,0 +1,16 @@
+title: MoonDew
+medium: Generative art, written in Python (no AI)
+year: 2023
+caption: >-
+  Some of my first renderings of a generative piece, made by fiddling around with
+  Python. Work in progress. The nerdy next step is to draw these vectors on paper
+  with a pen plotter, maybe one I build for my CNC machine.
+image: ./moondew.jpg
+alt: A pale crescent moon built from fanned lines on a dark purple background.
+order: 2
+media:
+  - kind: instagram
+    url: https://www.instagram.com/reel/Cqeow7mN2-x/
+    title: MoonDew, first renderings
+    poster: ./moondew.jpg
+    alt: A pale crescent moon built from fanned lines on a dark purple background.

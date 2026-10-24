@@ -107,6 +107,32 @@ test('lightbox opens, moves with arrow keys, and closes with Escape', async ({ p
   await expect(first).toBeFocused();
 });
 
+test('video and audio players load only after Play', async ({ page }) => {
+  const thirdParty: string[] = [];
+  await page.route(/instagram\.com|soundcloud\.com/, (route) => {
+    thirdParty.push(route.request().url());
+    return route.fulfill({ body: '<!doctype html><title>player</title>', contentType: 'text/html' });
+  });
+  await page.goto('/art/');
+  await page.locator('[data-gallery] a.still').first().click();
+  const dialog = page.locator('[data-lightbox]');
+  await expect(dialog.locator('iframe')).toHaveCount(0);
+  expect(thirdParty).toEqual([]);
+
+  await dialog.getByRole('button', { name: 'Play video' }).click();
+  await expect(dialog.locator('iframe')).toHaveAttribute('src', /instagram\.com\/reel\/[^/]+\/embed\/$/);
+
+  await dialog.getByRole('button', { name: 'First memories working in the corn fields' }).click();
+  await expect(dialog.locator('iframe')).toHaveCount(0);
+  await page.keyboard.press('ArrowLeft');
+  await expect(dialog.locator('.lb-title')).toHaveText('alluvium.');
+  await dialog.getByRole('button', { name: 'Play audio' }).click();
+  await expect(dialog.locator('iframe')).toHaveAttribute('src', /w\.soundcloud\.com\/player/);
+
+  await dialog.getByRole('button', { name: 'Close' }).click();
+  await expect(page.locator('[data-lightbox] iframe')).toHaveCount(0);
+});
+
 test('unknown pages get the 404 page', async ({ page }) => {
   await page.goto('/no-such-part/');
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Missing part');

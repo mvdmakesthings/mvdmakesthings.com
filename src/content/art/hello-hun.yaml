@@ -1,0 +1,27 @@
+title: Hello, Hun
+medium: Phone installation with recorded interview
+year: 2024
+caption: >-
+  My great-grandmother, Isabelle June Barrett, was 95 when I interviewed her about
+  loss, grief, community, and keeping a positive mindset. Hello, Hun shares excerpts
+  of her stories through a phone installation, shown in the Echos of Endings group
+  show at Aurora Gallery.
+image: ./hello-hun-1.jpg
+alt: A black rotary phone labeled Hello Hun beside a framed letter on a wooden desk.
+order: 1
+media:
+  - kind: instagram
+    url: https://www.instagram.com/reel/C6mTpDxOdMq/
+    title: Hello, Hun
+    poster: ./hello-hun-1.jpg
+    alt: A black rotary phone labeled Hello Hun beside a framed letter on a wooden desk.
+  - kind: instagram
+    url: https://www.instagram.com/reel/C3WscCWN1qi/
+    title: First memories working in the corn fields
+    poster: ./hello-hun-2.jpg
+    alt: Isabelle June Barrett, 95, speaking into a microphone on her couch.
+  - kind: instagram
+    url: https://www.instagram.com/reel/C6oZ79Yuopb/
+    title: An unreleased excerpt, and building the phone
+    poster: ./hello-hun-3.jpg
+    alt: The installation table with a rotary phone, a framed letter, white gloves, and a plant.
