@@ -1,8 +1,36 @@
 ---
 import Base from '../layouts/Base.astro';
+import Gallery from '../components/art/Gallery.astro';
+import { isPlaceholder, pieces } from '../lib/art';
+import { site } from '../data/site';
+
+const all = await pieces();
+const placeholders = all.some(isPlaceholder);
 ---
 
-<Base title="Art" sheet="Art" description="Paintings, sculpture, and interactive pieces by Michael VanDyke.">
+<Base
+  title="Art"
+  sheet="Art"
+  description="Paintings, sculpture, woodwork, and interactive pieces by Michael VanDyke."
+>
   <h1 class="page-title">Art</h1>
-  <p class="lede">Paintings, sculpture, and interactive pieces. The gallery is being hung.</p>
+  <p class="lede">Painting, sculpture, woodwork, and interactive pieces. Open any piece for a closer look.</p>
+  {
+    placeholders && (
+      <p class="note">
+        The gallery is still being hung, so these are stand-ins. In the meantime, the real work is on{' '}
+        <a href={site.links.instagram}>Instagram</a>.
+      </p>
+    )
+  }
+  {all.length === 0 ? <p>Nothing hung yet.</p> : <Gallery pieces={all} />}
 </Base>
+
+<style>
+  .note {
+    max-width: var(--measure);
+    padding: var(--space-2);
+    border: 1px solid var(--ink);
+    margin-bottom: var(--space-4);
+  }
+</style>

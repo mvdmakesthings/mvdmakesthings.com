@@ -1,0 +1,281 @@
+---
+import { Image, getImage } from 'astro:assets';
+import { pieceMeta, type Piece } from '../../lib/art';
+
+interface Props {
+  pieces: Piece[];
+  /** Heading level for piece titles. */
+  level?: 2 | 3;
+  /** Home page preview: no lightbox, links go to the gallery. */
+  preview?: boolean;
+}
+
+const { pieces, level = 2, preview = false } = Astro.props;
+const Heading = `h${level}` as const;
+const items = await Promise.all(
+  pieces.map(async (piece) => ({
+    piece,
+    full: await getImage({ src: piece.data.image, width: Math.min(1800, piece.data.image.width) }),
+    alt: piece.data.alt ?? piece.data.caption,
+  })),
+);
+---
+
+<ul class:list={['gallery', { preview }]} data-gallery={preview ? undefined : ''}>
+  {
+    items.map(({ piece, full, alt }, index) => (
+      <li class="piece">
+        <a
+          href={preview ? `/art/#${piece.id}` : full.src}
+          id={preview ? undefined : piece.id}
+          data-index={index}
+          data-full={full.src}
+          data-title={piece.data.title}
+          data-meta={pieceMeta(piece)}
+          data-caption={piece.data.caption}
+          data-alt={alt}
+        >
+          <Image
+            src={piece.data.image}
+            alt={alt}
+            widths={[360, 720]}
+            sizes={preview ? '(min-width: 64rem) 12rem, 30vw' : '(min-width: 48rem) 22rem, 100vw'}
+            loading="lazy"
+          />
+        </a>
+        {
+          !preview && (
+            <div class="label">
+              <Heading class="title">{piece.data.title}</Heading>
+              <p class="meta">{pieceMeta(piece)}</p>
+            </div>
+          )
+        }
+      </li>
+    ))
+  }
+</ul>
+
+{
+  !preview && (
+    <dialog class="lightbox" aria-labelledby="lightbox-title" data-lightbox>
+      <div class="frame">
+        <img class="lb-image" alt="" />
+      </div>
+      <div class="lb-text">
+        <h2 id="lightbox-title" class="lb-title" />
+        <p class="meta lb-meta" />
+        <p class="lb-caption" />
+        <p class="meta lb-count" aria-live="polite" />
+      </div>
+      <div class="lb-controls">
+        <button type="button" data-prev>Previous</button>
+        <button type="button" data-next>Next</button>
+        <button type="button" data-close autofocus>Close</button>
+      </div>
+    </dialog>
+  )
+}
+
+<script>
+  // Lightbox: a modal <dialog>, so focus is trapped and Escape closes it natively.
+  // Arrow keys and swipes move between pieces. Without JS the links open the image.
+  function init() {
+    const gallery = document.querySelector<HTMLElement>('[data-gallery]');
+    const dialog = document.querySelector<HTMLDialogElement>('[data-lightbox]');
+    if (!gallery || !dialog || dialog.dataset.ready) return;
+    dialog.dataset.ready = 'true';
+
+    const links = [...gallery.querySelectorAll<HTMLAnchorElement>('a[data-full]')];
+    const image = dialog.querySelector<HTMLImageElement>('.lb-image')!;
+    const title = dialog.querySelector<HTMLElement>('.lb-title')!;
+    const meta = dialog.querySelector<HTMLElement>('.lb-meta')!;
+    const caption = dialog.querySelector<HTMLElement>('.lb-caption')!;
+    const count = dialog.querySelector<HTMLElement>('.lb-count')!;
+    let current = 0;
+    let opener: HTMLElement | null = null;
+
+    const show = (index: number) => {
+      current = (index + links.length) % links.length;
+      const d = links[current].dataset;
+      image.src = d.full!;
+      image.alt = d.alt ?? '';
+      title.textContent = d.title ?? '';
+      meta.textContent = d.meta ?? '';
+      caption.textContent = d.caption ?? '';
+      count.textContent = `${current + 1} of ${links.length}`;
+    };
+
+    links.forEach((link, index) =>
+      link.addEventListener('click', (event) => {
+        event.preventDefault();
+        opener = link;
+        show(index);
+        dialog.showModal();
+      }),
+    );
+
+    dialog.querySelector('[data-prev]')!.addEventListener('click', () => show(current - 1));
+    dialog.querySelector('[data-next]')!.addEventListener('click', () => show(current + 1));
+    dialog.querySelector('[data-close]')!.addEventListener('click', () => dialog.close());
+    dialog.addEventListener('close', () => opener?.focus());
+    dialog.addEventListener('click', (event) => {
+      if (event.target === dialog) dialog.close();
+    });
+    dialog.addEventListener('keydown', (event) => {
+      if (event.key === 'ArrowLeft') show(current - 1);
+      if (event.key === 'ArrowRight') show(current + 1);
+    });
+
+    let startX = 0;
+    dialog.addEventListener('pointerdown', (event) => {
+      if (event.pointerType === 'touch') startX = event.clientX;
+    });
+    dialog.addEventListener('pointerup', (event) => {
+      if (event.pointerType !== 'touch') return;
+      const dx = event.clientX - startX;
+      if (Math.abs(dx) > 50) show(current + (dx < 0 ? 1 : -1));
+    });
+  }
+
+  document.addEventListener('astro:page-load', init);
+</script>
+
+<style>
+  .gallery {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr));
+    gap: var(--space-4) var(--space-3);
+    align-items: start;
+  }
+
+  .gallery.preview {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-2);
+  }
+
+  .piece a {
+    display: block;
+  }
+
+  .piece img {
+    width: 100%;
+    height: auto;
+    border: 1px solid var(--ink);
+  }
+
+  .preview .piece img {
+    aspect-ratio: 1;
+    object-fit: cover;
+  }
+
+  .label {
+    padding-top: var(--space-1);
+  }
+
+  .title {
+    font-size: var(--step-2);
+    margin-bottom: 0.2rem;
+  }
+
+  .label .meta {
+    margin: 0;
+  }
+
+  .lightbox {
+    width: min(100vw - 2rem, 72rem);
+    max-height: calc(100dvh - 2rem);
+    padding: var(--space-2);
+    border: 1px solid var(--ink);
+    background: var(--paper);
+    color: var(--ink);
+    overflow: auto;
+  }
+
+  .lightbox[open] {
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .lightbox::backdrop {
+    background: color-mix(in srgb, var(--paper) 92%, transparent);
+  }
+
+  .frame {
+    display: grid;
+    place-items: center;
+    touch-action: pan-y;
+  }
+
+  .lb-image {
+    max-width: 100%;
+    max-height: 70dvh;
+    width: auto;
+    height: auto;
+    border: 1px solid var(--ink);
+  }
+
+  .lb-title {
+    font-size: var(--step-3);
+    margin-bottom: 0.2rem;
+  }
+
+  .lb-meta,
+  .lb-caption {
+    margin-bottom: 0.4rem;
+  }
+
+  .lb-count {
+    margin: 0;
+  }
+
+  .lb-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-3);
+  }
+
+  .lb-controls button {
+    min-height: 2.75rem;
+    padding: 0 var(--space-2);
+    border: 1px solid var(--ink);
+    background: var(--paper);
+    cursor: pointer;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: var(--step-0);
+    letter-spacing: 0.01em;
+  }
+
+  .lb-controls button:hover {
+    background: var(--ink);
+    color: var(--paper);
+  }
+
+  .lb-controls [data-close] {
+    margin-left: auto;
+  }
+
+  @media (min-width: 64rem) {
+    .lightbox[open] {
+      grid-template-columns: minmax(0, 1fr) 18rem;
+      grid-template-rows: 1fr auto;
+      align-items: end;
+    }
+
+    .frame {
+      grid-row: 1 / -1;
+    }
+
+    .lb-text {
+      align-self: start;
+    }
+
+    .lb-controls [data-close] {
+      margin-left: 0;
+    }
+  }
+</style>

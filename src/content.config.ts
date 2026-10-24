@@ -42,4 +42,20 @@ const writing = defineCollection({
   }),
 });
 
-export const collections = { projects, writing };
+// One YAML file per piece, with its image beside it in src/content/art/.
+const art = defineCollection({
+  loader: glob({ pattern: '*.{yaml,yml}', base: './src/content/art' }),
+  schema: ({ image }) =>
+    z.object({
+      title: z.string(),
+      medium: z.string(),
+      year: z.number(),
+      dimensions: z.string().optional(),
+      caption: z.string(),
+      image: image(),
+      alt: z.string().optional(),
+      order: z.number().optional(),
+    }),
+});
+
+export const collections = { projects, writing, art };

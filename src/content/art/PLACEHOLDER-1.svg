@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1500" width="1200" height="1500">
+  <!-- PLACEHOLDER: replace this file with a photo of a real piece. -->
+  <rect width="1200" height="1500" fill="#e9dcc4"/>
+  <rect x="24" y="24" width="1152" height="1452" fill="none" stroke="#000" stroke-width="3"/>
+  <path d="M24 24L1176 1476M1176 24L24 1476" stroke="#6b665e" stroke-width="2" stroke-dasharray="18 10"/>
+  <rect x="340" y="680" width="520" height="140" fill="#e9dcc4" stroke="#000" stroke-width="3"/>
+  <text x="600" y="744" text-anchor="middle" font-family="Arial Narrow, Arial, sans-serif" font-weight="700" font-size="64" fill="#000">PLACEHOLDER 1</text>
+  <text x="600" y="794" text-anchor="middle" font-family="Georgia, serif" font-style="italic" font-size="30" fill="#874613">Art goes here</text>
+</svg>
