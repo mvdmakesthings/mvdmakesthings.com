@@ -13,7 +13,14 @@ const { title, description, pubDate, updatedDate } = post.data;
 const iso = (date: Date) => date.toISOString().slice(0, 10);
 ---
 
-<Base title={title} sheet="Writing" description={description} type="article">
+<Base
+  title={title}
+  sheet="Writing"
+  description={description}
+  type="article"
+  published={pubDate}
+  modified={updatedDate}
+>
   <article class="post">
     <header>
       <p class="meta">

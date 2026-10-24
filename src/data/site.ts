@@ -11,7 +11,7 @@ export const site = {
   title: 'MVD Makes Things',
   url: 'https://mvdmakesthings.com',
   description:
-    'Michael VanDyke: engineering leader, artist, and lifelong maker in Louisville, Kentucky.',
+    'Michael VanDyke (MVD) is a software engineering leader, visual artist, and lifelong maker in Louisville, Kentucky. Projects, writing, art, and resume.',
   location: 'Louisville, Kentucky',
   // TODO(Michael): set a contact address to show a mailto link in the bio and footer.
   email: undefined as string | undefined,
