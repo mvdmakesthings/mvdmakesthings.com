@@ -1,0 +1,52 @@
+---
+---
+
+<button class="theme-toggle" type="button" data-theme-toggle aria-pressed="false">
+  <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
+    <circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.5"></circle>
+    <path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"></path>
+  </svg>
+  <span class="visually-hidden">Dark theme</span>
+</button>
+
+<script>
+  import { currentTheme, toggleTheme } from '../scripts/theme';
+
+  function sync() {
+    const pressed = String(currentTheme() === 'dark');
+    document.querySelectorAll('[data-theme-toggle]').forEach((button) => {
+      button.setAttribute('aria-pressed', pressed);
+    });
+  }
+
+  document.addEventListener('click', (event) => {
+    const target = event.target as Element | null;
+    if (target?.closest('[data-theme-toggle]')) toggleTheme();
+  });
+  document.addEventListener('themechange', sync);
+  document.addEventListener('astro:page-load', sync);
+</script>
+
+<style>
+  .theme-toggle {
+    display: inline-grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--ink);
+    cursor: pointer;
+  }
+
+  .theme-toggle svg {
+    width: 1.5rem;
+    height: 1.5rem;
+    transition: transform var(--dur) ease;
+  }
+
+  .theme-toggle[aria-pressed='true'] svg {
+    transform: rotate(180deg);
+  }
+</style>

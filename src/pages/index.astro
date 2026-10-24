@@ -1,18 +1,10 @@
 ---
-import Analytics from '@vercel/analytics/astro';
+import Base from '../layouts/Base.astro';
 ---
 
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content="Michael VanDyke: engineering leader, artist, and lifelong maker in Louisville, Kentucky." />
-    <title>MVD Makes Things</title>
-  </head>
-  <body>
-    <h1>MVD Makes Things</h1>
-    <p>Michael VanDyke. The workbench is being set up. Check back soon.</p>
-    <Analytics />
-  </body>
-</html>
+<Base sheet="Home">
+  <h1 class="page-title">I take things apart to see how they work. Then I make new ones.</h1>
+  <p class="lede">
+    Michael VanDyke. Engineering leader, artist, and lifelong maker in Louisville, Kentucky.
+  </p>
+</Base>

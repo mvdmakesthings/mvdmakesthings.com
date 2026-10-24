@@ -1,0 +1,85 @@
+---
+import { ClientRouter, fade } from 'astro:transitions';
+import { Font } from 'astro:assets';
+import Analytics from '@vercel/analytics/astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { site } from '../data/site';
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+  /** Name of this page in the footer title block. */
+  sheet: string;
+  /** Absolute or root-relative path to a social preview image. */
+  image?: string;
+  type?: 'website' | 'article';
+}
+
+const { title, description = site.description, sheet, image, type = 'website' } = Astro.props;
+const fullTitle = title ? `${title} | ${site.title}` : `${site.title}: ${site.name}`;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const imageUrl = image ? new URL(image, Astro.site).href : undefined;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <meta name="theme-color" content="#fbfbf9" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#1b1814" media="(prefers-color-scheme: dark)" />
+
+    <meta property="og:type" content={type} />
+    <meta property="og:site_name" content={site.title} />
+    <meta property="og:title" content={title ?? site.title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    {imageUrl && <meta property="og:image" content={imageUrl} />}
+    <meta name="twitter:card" content={imageUrl ? 'summary_large_image' : 'summary'} />
+
+    <slot name="head" />
+
+    <script is:inline>
+      // Set the theme before first paint so there is no flash, and again after
+      // each client-side navigation swaps in a fresh <html>.
+      (() => {
+        const apply = (doc) => {
+          let theme = null;
+          try {
+            theme = localStorage.getItem('theme');
+          } catch {}
+          if (theme !== 'light' && theme !== 'dark') {
+            theme = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+          }
+          doc.documentElement.dataset.theme = theme;
+          doc.documentElement.classList.add('js');
+        };
+        apply(document);
+        document.addEventListener('astro:before-swap', (event) => apply(event.newDocument));
+      })();
+    </script>
+
+    <Font cssVariable="--font-display" preload />
+    <Font cssVariable="--font-body" />
+    <Font cssVariable="--font-mono" />
+    <ClientRouter />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <div class="sheet">
+      <Header />
+      <main id="main" transition:animate={fade({ duration: '180ms' })}>
+        <slot />
+      </main>
+      <Footer sheet={sheet} />
+    </div>
+    <Analytics />
+  </body>
+</html>
