@@ -17,10 +17,10 @@ interface Props {
   type?: 'website' | 'article';
 }
 
-const { title, description = site.description, sheet, image, type = 'website' } = Astro.props;
+const { title, description = site.description, sheet, image = '/og.jpg', type = 'website' } = Astro.props;
 const fullTitle = title ? `${title} | ${site.title}` : `${site.title}: ${site.name}`;
 const canonical = new URL(Astro.url.pathname, Astro.site);
-const imageUrl = image ? new URL(image, Astro.site).href : undefined;
+const imageUrl = new URL(image, Astro.site).href;
 ---
 
 <!doctype html>
@@ -32,6 +32,7 @@ const imageUrl = image ? new URL(image, Astro.site).href : undefined;
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="sitemap" href="/sitemap-index.xml" />
     <link rel="alternate" type="application/rss+xml" title={`${site.title}: Writing`} href="/rss.xml" />
     <meta name="theme-color" content="#fbfbf9" media="(prefers-color-scheme: light)" />
@@ -42,8 +43,9 @@ const imageUrl = image ? new URL(image, Astro.site).href : undefined;
     <meta property="og:title" content={title ?? site.title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
-    {imageUrl && <meta property="og:image" content={imageUrl} />}
-    <meta name="twitter:card" content={imageUrl ? 'summary_large_image' : 'summary'} />
+    <meta property="og:image" content={imageUrl} />
+    <meta property="og:image:alt" content="Michael VanDyke beside the headline: I take things apart to see how they work. Then I make new ones." />
+    <meta name="twitter:card" content="summary_large_image" />
 
     <slot name="head" />
 
