@@ -252,3 +252,42 @@ pre.astro-code {
   background: color-mix(in srgb, var(--ink) 6%, var(--paper));
   border-radius: 2px;
 }
+
+/* Print: any page comes out as black ink on white paper without the site chrome. */
+@page {
+  size: letter;
+  margin: 0.5in 0.6in;
+}
+
+@media print {
+  :root,
+  :root[data-theme='dark'] {
+    --paper: #ffffff;
+    --ink: #000000;
+    --pencil: #444444;
+    --copper: #000000;
+    --teal: #000000;
+    --kraft: #ffffff;
+    --pencil-on-kraft: #444444;
+    --copper-on-kraft: #000000;
+    color-scheme: light;
+  }
+
+  .skip-link,
+  .site-header,
+  .site-footer {
+    display: none !important;
+  }
+
+  .sheet {
+    border: 0;
+    margin: 0;
+    width: auto;
+    max-width: none;
+    min-height: 0;
+  }
+
+  main {
+    padding: 0;
+  }
+}

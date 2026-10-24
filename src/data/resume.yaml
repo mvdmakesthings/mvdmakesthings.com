@@ -1,0 +1,65 @@
+# The resume page renders this file. Anything still starting with "TODO" is left off
+# the public page (and shown with a dashed outline in `pnpm dev`), so fill it in at
+# your own pace. After editing, run `pnpm resume:pdf` to refresh public/resume.pdf.
+#
+# The repo is public: put nothing here you wouldn't put on LinkedIn.
+
+name: Michael VanDyke
+title: Technology strategist. People-first leader.
+location: Louisville, Kentucky
+# email: you@example.com   # TODO(Michael): optional; also set `email` in src/data/site.ts
+
+intro: >-
+  I lead distributed engineering teams through modernization work: moving old systems
+  into the cloud, building observability, and making decisions with data. I stay close
+  to the code.
+
+links:
+  - label: LinkedIn
+    url: https://www.linkedin.com/in/mjvandyke/
+  - label: GitHub
+    url: https://github.com/mvdmakesthings
+  - label: Website
+    url: https://mvdmakesthings.com
+
+# Most recent first. Dates are free text ("2021", "Mar 2021", "Present").
+experience:
+  - role: TODO Role title
+    company: TODO Company
+    location: TODO City, State or Remote
+    start: TODO
+    end: Present
+    summary: TODO One sentence on the scope of the job (team size, systems, budget).
+    highlights:
+      - TODO An outcome, with a number if you have one.
+      - TODO Another outcome.
+  - role: TODO Previous role
+    company: TODO Company
+    start: TODO
+    end: TODO
+    highlights:
+      - TODO An outcome.
+
+skills:
+  - group: Leadership
+    items:
+      - Distributed engineering teams
+      - Legacy modernization and cloud migration
+      - Observability
+      - Data-driven decision making
+  - group: Engineering
+    items: [Swift and iOS, Python, TypeScript, Traditional AI and ML, AWS]
+  - group: Making
+    items: [Woodworking, Electronics, Painting, Sculpture, Interactive art]
+
+education:
+  - school: TODO School
+    degree: TODO Degree
+    year: TODO
+
+# Talks, writing, or recognition worth listing. Delete the TODO entry if none.
+talks:
+  - title: TODO Talk or article title
+    venue: TODO Where
+    year: TODO
+    url: # optional

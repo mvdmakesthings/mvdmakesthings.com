@@ -1,8 +1,381 @@
 ---
+import { existsSync } from 'node:fs';
 import Base from '../layouts/Base.astro';
+import { isTodo, loadResume } from '../lib/resume';
+
+const resume = loadResume();
+const dev = import.meta.env.DEV;
+const hasPdf = existsSync('public/resume.pdf');
+const linkedin = resume.links.find((link) => link.label === 'LinkedIn');
+
+// Public builds leave out anything still marked TODO; dev shows it, outlined.
+const keep = <T,>(items: T[], key: (item: T) => string | undefined) =>
+  items.filter((item) => dev || !isTodo(key(item)));
+const experience = keep(resume.experience, (job) => job.company || job.role);
+const education = keep(resume.education, (school) => school.school);
+const talks = keep(resume.talks, (talk) => talk.title);
+const todo = (value?: string) => (dev && isTodo(value) ? 'todo' : undefined);
+const dates = (start?: string, end?: string) => [start, end].filter((d) => d && !(isTodo(d) && !dev)).join(' to ');
+const show = (value?: string) => (value && (dev || !isTodo(value)) ? value : undefined);
+const plain = (url: string) => url.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '');
 ---
 
-<Base title="Resume" sheet="Resume" description="Michael VanDyke's resume: engineering leadership, modernization, and hands-on building.">
-  <h1 class="page-title">Resume</h1>
-  <p class="lede">Technology strategist. People-first leader. The full resume goes up shortly.</p>
+<Base
+  title="Resume"
+  sheet="Resume"
+  description={`${resume.name}: ${resume.title} Engineering leadership, modernization, and hands-on building in ${resume.location}.`}
+>
+  <div class="resume">
+    <header class="masthead">
+      <h1>{resume.name}</h1>
+      <p class="title">{resume.title}</p>
+      <p class="actions no-print">
+        <button type="button" data-print>Save as PDF</button>
+        {hasPdf && <a href="/resume.pdf" download>Download the PDF</a>}
+      </p>
+    </header>
+
+    <aside class="side kraft" aria-label="Contact and skills">
+      <section>
+        <h2>Contact</h2>
+        <p>{resume.location}</p>
+        {resume.email && <p><a href={`mailto:${resume.email}`}>{resume.email}</a></p>}
+        <ul class="plain">
+          {
+            resume.links.map((link) => (
+              <li>
+                <a href={link.url}>
+                  <span class="screen">{link.label}</span>
+                  <span class="print">{plain(link.url)}</span>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+      {
+        resume.skills.map((group) => (
+          <section>
+            <h2>{group.group}</h2>
+            <ul class="plain">
+              {group.items.map((item) => (
+                <li>{item}</li>
+              ))}
+            </ul>
+          </section>
+        ))
+      }
+    </aside>
+
+    <div class="main">
+      {show(resume.intro) && <p class="intro">{resume.intro}</p>}
+
+      <section aria-labelledby="experience-title">
+        <h2 id="experience-title">Experience</h2>
+        {
+          experience.length === 0 ? (
+            <p class="pending">
+              The full work history is going up here soon.
+              {linkedin && (
+                <>
+                  {' '}
+                  Until then, it's on <a href={linkedin.url}>LinkedIn</a>.
+                </>
+              )}
+            </p>
+          ) : (
+            <ol class="timeline">
+              {experience.map((job) => (
+                <li class:list={['job', todo(job.company)]}>
+                  <p class="when">{dates(job.start, job.end)}</p>
+                  <div>
+                    <h3>{job.role}</h3>
+                    <p class="where">{[job.company, show(job.location)].filter(Boolean).join(', ')}</p>
+                    {show(job.summary) && <p>{job.summary}</p>}
+                    {job.highlights.length > 0 && (
+                      <ul>
+                        {job.highlights
+                          .filter((h) => dev || !isTodo(h))
+                          .map((h) => (
+                            <li class={todo(h)}>{h}</li>
+                          ))}
+                      </ul>
+                    )}
+                  </div>
+                </li>
+              ))}
+            </ol>
+          )
+        }
+      </section>
+
+      {
+        education.length > 0 && (
+          <section aria-labelledby="education-title">
+            <h2 id="education-title">Education</h2>
+            <ul class="plain entries">
+              {education.map((school) => (
+                <li class={todo(school.school)}>
+                  <strong>{school.school}</strong>
+                  {[show(school.degree), show(school.year)].filter(Boolean).map((v) => `, ${v}`)}
+                </li>
+              ))}
+            </ul>
+          </section>
+        )
+      }
+
+      {
+        talks.length > 0 && (
+          <section aria-labelledby="talks-title">
+            <h2 id="talks-title">Talks and writing</h2>
+            <ul class="plain entries">
+              {talks.map((talk) => (
+                <li class={todo(talk.title)}>
+                  {talk.url ? <a href={talk.url}>{talk.title}</a> : <strong>{talk.title}</strong>}
+                  {[show(talk.venue), show(talk.year)].filter(Boolean).map((v) => `, ${v}`)}
+                </li>
+              ))}
+            </ul>
+          </section>
+        )
+      }
+    </div>
+  </div>
 </Base>
+
+<script>
+  document.addEventListener('click', (event) => {
+    if ((event.target as Element | null)?.closest('[data-print]')) window.print();
+  });
+</script>
+
+<style>
+  .resume {
+    display: grid;
+    gap: var(--space-4);
+    grid-template-areas: 'head' 'main' 'side';
+  }
+
+  .masthead {
+    grid-area: head;
+    border-bottom: 1px solid var(--ink);
+    padding-bottom: var(--space-3);
+  }
+
+  h1 {
+    font-size: clamp(var(--step-5), 9vw, var(--step-6));
+    margin-bottom: var(--space-1);
+  }
+
+  .title {
+    font-size: var(--step-1);
+    font-style: italic;
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-1) var(--space-3);
+    margin: var(--space-2) 0 0;
+  }
+
+  .actions button {
+    min-height: 2.75rem;
+    padding: 0 var(--space-2);
+    border: 1px solid var(--ink);
+    background: var(--ink);
+    color: var(--paper);
+    cursor: pointer;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: var(--step-0);
+    letter-spacing: 0.01em;
+  }
+
+  .actions button:hover {
+    background: var(--paper);
+    color: var(--ink);
+  }
+
+  .main {
+    grid-area: main;
+    min-width: 0;
+  }
+
+  .side {
+    grid-area: side;
+    align-self: start;
+    padding: var(--space-3);
+    border: 1px solid var(--ink);
+  }
+
+  .side section + section {
+    margin-top: var(--space-3);
+  }
+
+  .side h2 {
+    font-size: var(--step-1);
+    margin-bottom: var(--space-1);
+  }
+
+  .side p {
+    margin-bottom: 0.25rem;
+  }
+
+  .plain {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .side li a {
+    display: inline-block;
+    padding: 0.2rem 0;
+  }
+
+  .print {
+    display: none;
+  }
+
+  .main h2 {
+    font-size: var(--step-3);
+    margin: var(--space-4) 0 var(--space-2);
+  }
+
+  .main section:first-of-type h2 {
+    margin-top: 0;
+  }
+
+  .intro {
+    font-size: var(--step-1);
+    line-height: 1.45;
+    max-width: 50ch;
+    margin-bottom: var(--space-4);
+  }
+
+  .timeline {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    border-top: 1px solid var(--ink);
+  }
+
+  .job {
+    display: grid;
+    gap: 0.25rem var(--space-3);
+    padding: var(--space-2) 0;
+    border-bottom: 1px solid var(--pencil);
+  }
+
+  .job h3 {
+    font-size: var(--step-2);
+    margin-bottom: 0.2rem;
+  }
+
+  .when,
+  .where {
+    color: var(--pencil);
+    margin-bottom: 0.25rem;
+  }
+
+  .job ul {
+    padding-left: 1.1rem;
+    margin: 0;
+  }
+
+  .entries li + li {
+    margin-top: 0.4rem;
+  }
+
+  .pending {
+    max-width: var(--measure);
+  }
+
+  .todo {
+    outline: 1px dashed var(--copper);
+    outline-offset: 2px;
+  }
+
+  @media (min-width: 48rem) {
+    .job {
+      grid-template-columns: 9rem minmax(0, 1fr);
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .resume {
+      grid-template-columns: minmax(0, 1fr) 18rem;
+      grid-template-areas: 'head head' 'main side';
+      column-gap: var(--space-5);
+    }
+  }
+
+  /* Paper: US Letter, black on white, no site chrome. */
+  @media print {
+    .no-print {
+      display: none;
+    }
+
+    .screen {
+      display: none;
+    }
+
+    .print {
+      display: inline;
+    }
+
+    .resume {
+      grid-template-columns: minmax(0, 1fr) 2.1in;
+      grid-template-areas: 'head head' 'main side';
+      gap: 0.2in 0.3in;
+      font-size: 10pt;
+      line-height: 1.4;
+    }
+
+    h1 {
+      font-size: 26pt;
+    }
+
+    .title,
+    .intro {
+      font-size: 11pt;
+    }
+
+    .masthead {
+      padding-bottom: 0.1in;
+    }
+
+    .main h2 {
+      font-size: 14pt;
+      margin: 0.18in 0 0.08in;
+    }
+
+    .job {
+      grid-template-columns: 1.1in minmax(0, 1fr);
+      padding: 0.08in 0;
+      break-inside: avoid;
+    }
+
+    .job h3 {
+      font-size: 12pt;
+    }
+
+    .side {
+      padding: 0.12in;
+      border: 0;
+      border-left: 1px solid #000;
+      background: none;
+    }
+
+    .side h2 {
+      font-size: 11pt;
+    }
+
+    a {
+      color: #000;
+      text-decoration: none;
+    }
+  }
+</style>
