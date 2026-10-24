@@ -1,0 +1,644 @@
+---
+// The hero: an exploded-view drawing of a TV remote. Geometry is computed here at
+// build time; one CSS custom property, --explode (0 assembled, 1 apart), moves the
+// parts. The script below sets it from the pointer, scroll, resize, and focus.
+import {
+  bounds,
+  circle,
+  cylinder,
+  extrude,
+  line,
+  poly,
+  project,
+  ring,
+  roundRect,
+  type P2,
+  type P3,
+} from '../lib/axo';
+
+// Heights (z) of each layer when assembled.
+const SHELL_SPLIT = 10;
+const BOARD_Z = 14;
+const BOARD_TOP = BOARD_Z + 1.6;
+const PAD_Z = 18;
+const MEMBRANE_TOP = PAD_Z + 1.4;
+const KEY_TOP = 24.5;
+const SHELL_TOP = 24;
+
+type Key = { kind: 'round'; cx: number; cy: number; r: number } | { kind: 'rect'; x: number; y: number; w: number; h: number; r: number };
+
+const power: Key = { kind: 'round', cx: 34, cy: 13, r: 4.5 };
+const keys: Key[] = [
+  { kind: 'rect', x: 8, y: 10, w: 10, h: 6, r: 2 },
+  { kind: 'round', cx: 23, cy: 37, r: 11 },
+  { kind: 'rect', x: 6, y: 53, w: 8, h: 20, r: 3 },
+  { kind: 'rect', x: 32, y: 53, w: 8, h: 20, r: 3 },
+  { kind: 'rect', x: 18.5, y: 57, w: 9, h: 9, r: 2 },
+  ...[80, 90, 100, 110].flatMap((y) =>
+    [7, 19, 31].map((x): Key => ({ kind: 'rect', x, y, w: 8, h: 6.5, r: 2 })),
+  ),
+];
+
+const outline = (k: Key, z: number, grow = 0): P3[] =>
+  k.kind === 'round'
+    ? circle(k.cx, k.cy, k.r + grow, z)
+    : roundRect(k.x - grow, k.y - grow, k.w + 2 * grow, k.h + 2 * grow, k.r + grow, z);
+
+const center = (k: Key): [number, number] =>
+  k.kind === 'round' ? [k.cx, k.cy] : [k.x + k.w / 2, k.y + k.h / 2];
+
+// Top shell, with holes where the keys come through.
+const topShell = extrude(roundRect(0, 0, 46, 176, 10, SHELL_SPLIT), SHELL_TOP - SHELL_SPLIT);
+const holes = [power, ...keys].map((k) => poly(outline(k, SHELL_TOP, 0.9).map(project))).join('');
+const seam = line(roundRect(0, 0, 46, 176, 10, SHELL_TOP - 3).slice(0, 12).map(project));
+
+// Rubber keypad: a membrane with keys standing on it. The OK key sits on the d-pad.
+const membrane = extrude(roundRect(4, 6, 38, 124, 6, PAD_Z), MEMBRANE_TOP - PAD_Z);
+const keySolids = keys.map((k) => extrude(outline(k, MEMBRANE_TOP), k.kind === 'round' ? 2.6 : KEY_TOP - MEMBRANE_TOP));
+const okKey = extrude(circle(23, 37, 4.3, MEMBRANE_TOP + 2.6), KEY_TOP - MEMBRANE_TOP - 2.6);
+const powerKey = extrude(outline(power, MEMBRANE_TOP), KEY_TOP - MEMBRANE_TOP);
+
+// Circuit board: carbon pads under each key, traces, a chip, a crystal, the IR LED.
+const board = extrude(roundRect(3, 3, 40, 170, 4, BOARD_Z), BOARD_TOP - BOARD_Z);
+const pads = [power, ...keys]
+  .map((k) => {
+    const [cx, cy] = center(k);
+    return poly(circle(cx, cy, k.kind === 'round' && k.r > 6 ? 4 : 2.6, BOARD_TOP, 14).map(project));
+  })
+  .join('');
+const tracePaths: [number, number][][] = [
+  [[11, 83], [11, 67], [15, 67]],
+  [[23, 83], [23, 72]],
+  [[35, 83], [35, 67], [31, 67]],
+  [[13, 16], [13, 30], [11, 34], [11, 62], [15, 62]],
+  [[34, 18], [34, 30], [36, 34], [36, 62], [31, 62]],
+  [[23, 49], [23, 58]],
+  [[21, 3], [21, 8], [17, 12], [17, 22]],
+  [[40, 168], [40, 120], [38, 116], [38, 90], [33, 86], [33, 72]],
+  [[6, 168], [6, 120], [8, 116], [8, 76], [11, 72], [15, 70]],
+];
+const traces = tracePaths.map((pts) => line(pts.map(([x, y]) => project([x, y, BOARD_TOP])))).join('');
+const chip = extrude(roundRect(15, 58, 16, 14, 1, BOARD_TOP), 1.8);
+const crystal = extrude(roundRect(30, 96, 6, 11, 2.8, BOARD_TOP), 2.6);
+const led = cylinder(23, BOARD_TOP + 2.6, 2.6, -7, 2);
+const ledCenter = project([23, -7, BOARD_TOP + 2.6]);
+
+// Batteries and the contact plate at the far end.
+const batteries = [14.5, 31.5].map((cx) => ({
+  body: cylinder(cx, 7, 6.4, 112, 164),
+  band: cylinder(cx, 7, 6.45, 157, 164).body,
+  terminal: poly(ring(cx, 112, 7, 2.2, 12).map(project)),
+}));
+const plate = extrude(roundRect(6, 166, 34, 2, 0.8, 0.5), 11);
+
+// Bottom shell: a tray. The floor shows through the rim.
+const bottomShell = extrude(roundRect(0, 0, 46, 176, 10, 0), SHELL_SPLIT);
+const rim = poly(roundRect(2.5, 2.5, 41, 171, 8, SHELL_SPLIT).map(project));
+const floor = poly(roundRect(2.5, 2.5, 41, 171, 8, 2).map(project));
+
+// Battery door, with a latch.
+const door = extrude(roundRect(6, 112, 34, 56, 4, -1.5), 1.5);
+const latch = poly(roundRect(17, 113.5, 12, 4, 1.5, 0).map(project));
+
+// The MVD mark on the top shell, laid flat on its face.
+const mark = project([27, 138, SHELL_TOP]);
+const markMatrix = `matrix(0.95 -0.27 0.42 0.44 ${mark[0].toFixed(1)} ${mark[1].toFixed(1)})`;
+
+// Each part moves along the screen's vertical axis by dy * --explode, and turns a little.
+interface Callout {
+  text: string;
+  at: P3;
+  side: 'left' | 'right';
+  dy: number;
+}
+interface Part {
+  id: string;
+  dy: number;
+  rot: number;
+  callouts: Callout[];
+}
+const parts: Record<string, Part> = {
+  door: { id: 'door', dy: 120, rot: 1.5, callouts: [{ text: 'Battery\ndoor', at: [40, 150, 0], side: 'right', dy: 10 }] },
+  bottom: { id: 'bottom', dy: 75, rot: 0.8, callouts: [{ text: 'Bottom\nshell', at: [0, 30, 6], side: 'left', dy: 4 }] },
+  batteries: { id: 'batteries', dy: 25, rot: 1, callouts: [{ text: 'Two AA\nbatteries', at: [37.9, 150, 7], side: 'right', dy: 4 }] },
+  board: {
+    id: 'board',
+    dy: -30,
+    rot: -0.5,
+    callouts: [
+      { text: 'IR LED', at: [23, -7, BOARD_TOP + 2.6], side: 'left', dy: 0 },
+      { text: 'Circuit\nboard', at: [43, 150, BOARD_TOP], side: 'right', dy: 8 },
+    ],
+  },
+  keypad: { id: 'keypad', dy: -85, rot: -1, callouts: [{ text: 'Rubber\nkeypad', at: [4, 40, MEMBRANE_TOP], side: 'left', dy: -2 }] },
+  top: { id: 'top', dy: -140, rot: -1.5, callouts: [{ text: 'Top shell', at: [46, 150, 18], side: 'right', dy: 6 }] },
+};
+
+// Frame: the assembled footprint, stretched by the furthest offsets, plus room for labels.
+const footprint = bounds([
+  ...roundRect(0, 0, 46, 176, 10, -1.5).map(project),
+  ...roundRect(0, 0, 46, 176, 10, KEY_TOP).map(project),
+  ...ring(23, -7, BOARD_TOP + 2.6, 2.6).map(project),
+]);
+const LABEL_GAP = 14;
+const LABEL_ROOM = 86;
+const leftEdge = footprint.minX - LABEL_GAP;
+const rightEdge = footprint.maxX + LABEL_GAP;
+const offsets = Object.values(parts).map((p) => p.dy);
+const vb = {
+  x: Math.floor(leftEdge - LABEL_ROOM),
+  y: Math.floor(footprint.minY + Math.min(...offsets) - 14),
+  w: 0,
+  h: 0,
+};
+vb.w = Math.ceil(rightEdge + LABEL_ROOM - vb.x);
+vb.h = Math.ceil(footprint.maxY + Math.max(...offsets) + 14 - vb.y);
+
+function callout(c: Callout) {
+  const [ax, ay] = project(c.at);
+  const ly = ay + c.dy;
+  const lx = c.side === 'left' ? leftEdge : rightEdge;
+  const elbow: P2 = [c.side === 'left' ? lx + 6 : lx - 6, ly];
+  return {
+    leader: line([[lx + (c.side === 'left' ? 2 : -2), ly], elbow, [ax, ay]]),
+    dot: { cx: ax.toFixed(1), cy: ay.toFixed(1) },
+    label: { x: (c.side === 'left' ? lx - 4 : lx + 4).toFixed(1), anchor: c.side === 'left' ? 'end' : 'start' },
+    // Lines are centred on the leader; the first line's dy is in ems so it tracks font size.
+    lines: c.text.split('\n').map((text, i, all) => ({ text, dy: i === 0 ? `${(0.35 - (all.length - 1) * 0.55).toFixed(2)}em` : '1.1em' })),
+    y: ly.toFixed(1),
+  };
+}
+
+// Assembly lines: the dash-dot lines an exploded view uses to show where parts go back.
+const axisPoints = [project([23, -7, 0]), project([23, 176, 0])];
+const assembly = axisPoints.map(([x, y]) => line([[x, y + Math.min(...offsets)], [x, y + Math.max(...offsets)]])).join('');
+
+// The power key's centre as a fraction of the frame, for the real <button> laid over it.
+const [px, py] = project([power.cx, power.cy, KEY_TOP]);
+const powerStyle = [
+  `left:${(((px - vb.x) / vb.w) * 100).toFixed(2)}%`,
+  `top:${(((py - vb.y) / vb.h) * 100).toFixed(2)}%`,
+  `--dy:${parts.keypad.dy}`,
+  `--vbw:${vb.w}`,
+].join(';');
+
+const partStyle = (p: Part) => `--dy:${p.dy};--rot:${p.rot}`;
+const labelsFor = (p: Part) => p.callouts.map(callout);
+---
+
+<figure class="teardown" data-teardown style={`aspect-ratio:${vb.w}/${vb.h}`}>
+  <svg
+    viewBox={`${vb.x} ${vb.y} ${vb.w} ${vb.h}`}
+    role="img"
+    aria-labelledby="teardown-title"
+  >
+    <title id="teardown-title">
+      Exploded view of a TV remote: top shell, rubber keypad, circuit board with an IR LED, two AA
+      batteries, bottom shell, and battery door.
+    </title>
+    <defs>
+      <clipPath id="teardown-rim"><path d={rim}></path></clipPath>
+      <radialGradient id="teardown-glow">
+        <stop offset="0" stop-color="var(--led)" stop-opacity="0.9"></stop>
+        <stop offset="1" stop-color="var(--led)" stop-opacity="0"></stop>
+      </radialGradient>
+    </defs>
+
+    <path class="assembly" d={assembly}></path>
+
+    <g class="part" style={partStyle(parts.door)}>
+      <path class="side" d={door.side}></path>
+      <path class="face" d={door.top}></path>
+      <path class="detail" d={latch}></path>
+      {labelsFor(parts.door).map((c) => <g class="callout"><path d={c.leader} /><circle r="2" {...c.dot} /><text x={c.label.x} y={c.y} text-anchor={c.label.anchor}>{c.lines.map((l) => <tspan x={c.label.x} dy={l.dy}>{l.text}</tspan>)}</text></g>)}
+    </g>
+
+    <g class="part" style={partStyle(parts.bottom)}>
+      <path class="side" d={bottomShell.side}></path>
+      <path class="face" d={bottomShell.top}></path>
+      <path class="wall" d={rim}></path>
+      <path class="floor" d={floor} clip-path="url(#teardown-rim)"></path>
+      {labelsFor(parts.bottom).map((c) => <g class="callout"><path d={c.leader} /><circle r="2" {...c.dot} /><text x={c.label.x} y={c.y} text-anchor={c.label.anchor}>{c.lines.map((l) => <tspan x={c.label.x} dy={l.dy}>{l.text}</tspan>)}</text></g>)}
+    </g>
+
+    <g class="part" style={partStyle(parts.batteries)}>
+      <path class="side" d={plate.side}></path>
+      <path class="face" d={plate.top}></path>
+      {
+        batteries.map((b) => (
+          <g>
+            <path class="face" d={b.body.body} />
+            <path class="band" d={b.band} />
+            <path class="face" d={b.body.cap} />
+            <path class="detail" d={b.terminal} />
+          </g>
+        ))
+      }
+      {labelsFor(parts.batteries).map((c) => <g class="callout"><path d={c.leader} /><circle r="2" {...c.dot} /><text x={c.label.x} y={c.y} text-anchor={c.label.anchor}>{c.lines.map((l) => <tspan x={c.label.x} dy={l.dy}>{l.text}</tspan>)}</text></g>)}
+    </g>
+
+    <g class="part" style={partStyle(parts.board)}>
+      <path class="board-side" d={board.side}></path>
+      <path class="board-face" d={board.top}></path>
+      <path class="trace" d={traces}></path>
+      <path class="pad" d={pads}></path>
+      <path class="chip" d={chip.side}></path>
+      <path class="chip" d={chip.top}></path>
+      <path class="side" d={crystal.side}></path>
+      <path class="face" d={crystal.top}></path>
+      <g class="led" data-led>
+        <circle class="glow" cx={ledCenter[0].toFixed(1)} cy={ledCenter[1].toFixed(1)} r="16" fill="url(#teardown-glow)"></circle>
+        <path class="led-body" d={led.body}></path>
+        <path class="led-cap" d={led.cap}></path>
+      </g>
+      {labelsFor(parts.board).map((c) => <g class="callout"><path d={c.leader} /><circle r="2" {...c.dot} /><text x={c.label.x} y={c.y} text-anchor={c.label.anchor}>{c.lines.map((l) => <tspan x={c.label.x} dy={l.dy}>{l.text}</tspan>)}</text></g>)}
+    </g>
+
+    <g class="part" style={partStyle(parts.keypad)}>
+      <path class="side" d={membrane.side}></path>
+      <path class="face" d={membrane.top}></path>
+      {
+        keySolids.map((k) => (
+          <g>
+            <path class="side" d={k.side} />
+            <path class="face" d={k.top} />
+          </g>
+        ))
+      }
+      <path class="side" d={okKey.side}></path>
+      <path class="face" d={okKey.top}></path>
+      <g class="power-key" data-power-key>
+        <path class="power-side" d={powerKey.side}></path>
+        <path class="power-face" d={powerKey.top}></path>
+      </g>
+      {labelsFor(parts.keypad).map((c) => <g class="callout"><path d={c.leader} /><circle r="2" {...c.dot} /><text x={c.label.x} y={c.y} text-anchor={c.label.anchor}>{c.lines.map((l) => <tspan x={c.label.x} dy={l.dy}>{l.text}</tspan>)}</text></g>)}
+    </g>
+
+    <g class="part" style={partStyle(parts.top)}>
+      <path class="side" d={topShell.side}></path>
+      <path class="face" d={topShell.top + holes} fill-rule="evenodd"></path>
+      <path class="detail" d={seam}></path>
+      <text class="mark" transform={markMatrix}>MVD</text>
+      {labelsFor(parts.top).map((c) => <g class="callout"><path d={c.leader} /><circle r="2" {...c.dot} /><text x={c.label.x} y={c.y} text-anchor={c.label.anchor}>{c.lines.map((l) => <tspan x={c.label.x} dy={l.dy}>{l.text}</tspan>)}</text></g>)}
+    </g>
+  </svg>
+
+  <button
+    class="power"
+    type="button"
+    data-theme-toggle
+    data-power
+    aria-pressed="false"
+    style={powerStyle}
+  >
+    <span class="visually-hidden">Remote power button: dark theme</span>
+  </button>
+
+  <figcaption>
+    Fig. 1. Exploded view, TV remote.{' '}
+    <span class="hint-pointer">Move across the drawing to take it apart.{' '}</span>
+    <span class="hint-touch">Scroll to take it apart.{' '}</span>
+    The power button works.
+  </figcaption>
+</figure>
+
+<script>
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  const finePointer = matchMedia('(hover: hover) and (pointer: fine)');
+  const clamp = (v: number) => Math.min(1, Math.max(0, v));
+  let assembledOnce = false;
+  let abort: AbortController | undefined;
+
+  function init() {
+    abort?.abort();
+    const figure = document.querySelector<HTMLElement>('[data-teardown]');
+    if (!figure) return;
+    abort = new AbortController();
+    const { signal } = abort;
+    const hero = (figure.closest('[data-hero]') as HTMLElement | null) ?? figure;
+    const led = figure.querySelector<SVGGElement>('[data-led]');
+    const key = figure.querySelector<SVGGElement>('[data-power-key]');
+    const power = figure.querySelector<HTMLButtonElement>('[data-power]');
+
+    power?.addEventListener(
+      'click',
+      () => {
+        if (reduce.matches) return;
+        for (const [el, cls, ms] of [[led, 'blink', 420], [key, 'pressed', 140]] as const) {
+          if (!el) continue;
+          el.classList.remove(cls);
+          void el.getBoundingClientRect();
+          el.classList.add(cls);
+          setTimeout(() => el.classList.remove(cls), ms);
+        }
+      },
+      { signal },
+    );
+
+    if (reduce.matches) {
+      figure.style.setProperty('--explode', '0.6');
+      return;
+    }
+
+    // One number drives the drawing. Inputs set a target; frames ease toward it.
+    let target = 0;
+    let nudge = 0;
+    let current = assembledOnce ? 0 : 1;
+    let loadStart = assembledOnce ? -1 : performance.now();
+    let frame = 0;
+    let lastWidth = innerWidth;
+    let focused = false;
+    assembledOnce = true;
+
+    const goal = () => clamp(Math.max(target, focused ? 0.7 : 0) + nudge);
+    const tick = (now: number) => {
+      if (loadStart >= 0) {
+        const t = Math.min(1, (now - loadStart) / 900);
+        current = 1 + (goal() - 1) * (1 - (1 - t) ** 3);
+        if (t === 1) loadStart = -1;
+      } else {
+        nudge *= 0.92;
+        if (nudge < 0.002) nudge = 0;
+        current += (goal() - current) * 0.16;
+      }
+      figure.style.setProperty('--explode', current.toFixed(3));
+      frame = loadStart >= 0 || nudge > 0 || Math.abs(goal() - current) > 0.001 ? requestAnimationFrame(tick) : 0;
+    };
+    const kick = () => {
+      if (!frame) frame = requestAnimationFrame(tick);
+    };
+
+    const fromScroll = () => {
+      const r = figure.getBoundingClientRect();
+      target = clamp((innerHeight * 0.9 - r.top) / (innerHeight * 0.75));
+    };
+
+    hero.addEventListener(
+      'pointermove',
+      (e) => {
+        if (e.pointerType !== 'mouse' && e.pointerType !== 'pen') return;
+        const r = hero.getBoundingClientRect();
+        target = clamp((e.clientX - r.left - r.width * 0.4) / (r.width * 0.45));
+        kick();
+      },
+      { signal },
+    );
+    addEventListener(
+      'scroll',
+      () => {
+        if (finePointer.matches) return;
+        fromScroll();
+        kick();
+      },
+      { passive: true, signal },
+    );
+    addEventListener(
+      'resize',
+      () => {
+        nudge = Math.min(0.6, nudge + Math.abs(innerWidth - lastWidth) / 300);
+        lastWidth = innerWidth;
+        if (!finePointer.matches) fromScroll();
+        kick();
+      },
+      { signal },
+    );
+    figure.addEventListener('focusin', () => ((focused = true), kick()), { signal });
+    figure.addEventListener('focusout', () => ((focused = false), kick()), { signal });
+
+    if (!finePointer.matches) fromScroll();
+    kick();
+  }
+
+  document.addEventListener('astro:page-load', init);
+</script>
+
+<style is:global>
+  @property --explode {
+    syntax: '<number>';
+    inherits: true;
+    initial-value: 0;
+  }
+
+  .teardown {
+    --explode: 1;
+    --labels: clamp(0, calc((var(--explode) - 0.4) * 4), 1);
+    position: relative;
+    container-type: inline-size;
+    margin: 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .teardown {
+      --explode: 0.6;
+    }
+  }
+
+  .teardown svg {
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+
+  .teardown path {
+    stroke: var(--ink);
+    stroke-width: 1;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+  }
+
+  .teardown .part {
+    transform-box: fill-box;
+    transform-origin: center;
+    transform: translateY(calc(var(--explode) * var(--dy) * 1px)) rotate(calc(var(--explode) * var(--rot) * 1deg));
+  }
+
+  .teardown .side {
+    fill: color-mix(in srgb, var(--ink) 12%, var(--paper));
+    fill-rule: evenodd;
+  }
+
+  .teardown .face {
+    fill: var(--paper);
+  }
+
+  .teardown .wall {
+    fill: color-mix(in srgb, var(--ink) 22%, var(--paper));
+  }
+
+  .teardown .floor {
+    fill: color-mix(in srgb, var(--ink) 6%, var(--paper));
+  }
+
+  .teardown .detail {
+    fill: none;
+  }
+
+  .teardown .band {
+    fill: var(--copper);
+  }
+
+  .teardown .board-side {
+    fill: color-mix(in srgb, var(--teal) 70%, var(--ink));
+    fill-rule: evenodd;
+  }
+
+  .teardown .board-face {
+    fill: var(--teal);
+  }
+
+  .teardown .trace {
+    fill: none;
+    stroke: var(--copper);
+    stroke-width: 1.4;
+  }
+
+  .teardown .pad {
+    fill: color-mix(in srgb, var(--copper) 30%, var(--teal));
+    stroke: var(--copper);
+  }
+
+  .teardown .chip {
+    fill: #141210;
+    fill-rule: evenodd;
+  }
+
+  .teardown .led-body {
+    fill: color-mix(in srgb, var(--led) 35%, var(--paper));
+  }
+
+  .teardown .led-cap {
+    fill: color-mix(in srgb, var(--led) 55%, var(--paper));
+  }
+
+  .teardown .glow {
+    opacity: 0;
+    stroke: none;
+  }
+
+  .teardown .led.blink .glow {
+    animation: blink 420ms ease-out;
+  }
+
+  .teardown .led.blink .led-cap,
+  .teardown .led.blink .led-body {
+    animation: lit 420ms steps(1, end);
+  }
+
+  @keyframes blink {
+    0%,
+    60% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes lit {
+    0% {
+      fill: var(--led);
+    }
+  }
+
+  .teardown .power-side {
+    fill: color-mix(in srgb, var(--copper) 70%, var(--ink));
+    fill-rule: evenodd;
+  }
+
+  .teardown .power-face {
+    fill: var(--copper);
+  }
+
+  .teardown .power-key.pressed {
+    transform: translateY(2px);
+  }
+
+  .teardown .mark {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 12px;
+    fill: var(--pencil);
+  }
+
+  .teardown .assembly {
+    fill: none;
+    stroke: var(--pencil);
+    stroke-width: 0.8;
+    stroke-dasharray: 10 3 2 3;
+    opacity: var(--labels);
+  }
+
+  .teardown .callout {
+    opacity: var(--labels);
+  }
+
+  .teardown .callout path {
+    fill: none;
+    stroke: var(--pencil);
+    stroke-width: 0.8;
+  }
+
+  .teardown .callout circle {
+    fill: var(--ink);
+  }
+
+  .teardown .callout text {
+    font-family: var(--font-body);
+    font-size: 19px;
+    fill: var(--ink);
+  }
+
+  /* Labels are SVG text, so they scale with the drawing; smaller units on wide frames. */
+  @container (min-width: 30rem) {
+    .teardown .callout text {
+      font-size: 12px;
+    }
+  }
+
+  .teardown .power {
+    position: absolute;
+    width: 2.75rem;
+    height: 2.75rem;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    cursor: pointer;
+    translate: -50% -50%;
+    transform: translateY(calc(var(--explode) * var(--dy) * 100cqw / var(--vbw)));
+  }
+
+  .teardown .power:hover {
+    box-shadow: 0 0 0 1px var(--copper);
+  }
+
+  .teardown figcaption {
+    margin-top: var(--space-1);
+    font-size: var(--step--1);
+    color: var(--pencil);
+    font-style: italic;
+  }
+
+  .teardown .hint-touch {
+    display: none;
+  }
+
+  @media not ((hover: hover) and (pointer: fine)) {
+    .teardown .hint-pointer {
+      display: none;
+    }
+
+    .teardown .hint-touch {
+      display: inline;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .teardown .hint-pointer,
+    .teardown .hint-touch {
+      display: none;
+    }
+  }
+</style>
