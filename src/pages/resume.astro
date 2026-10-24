@@ -2,6 +2,7 @@
 import { existsSync } from 'node:fs';
 import Base from '../layouts/Base.astro';
 import { isTodo, loadResume } from '../lib/resume';
+import { graph, profilePage } from '../lib/schema';
 
 const resume = loadResume();
 const dev = import.meta.env.DEV;
@@ -17,6 +18,7 @@ const talks = keep(resume.talks, (talk) => talk.title);
 const todo = (value?: string) => (dev && isTodo(value) ? 'todo' : undefined);
 const dates = (start?: string, end?: string) => [start, end].filter((d) => d && !(isTodo(d) && !dev)).join(' to ');
 const show = (value?: string) => (value && (dev || !isTodo(value)) ? value : undefined);
+const jsonLd = graph(await profilePage(Astro.url.pathname));
 const plain = (url: string) => url.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '');
 ---
 
@@ -25,6 +27,7 @@ const plain = (url: string) => url.replace(/^https?:\/\/(www\.)?/, '').replace(/
   sheet="Resume"
   description={`${resume.name}: ${resume.title} Engineering leadership, modernization, and hands-on building in ${resume.location}.`}
 >
+  <script type="application/ld+json" slot="head" set:html={jsonLd} />
   <div class="resume">
     <header class="masthead">
       <h1>{resume.name}</h1>

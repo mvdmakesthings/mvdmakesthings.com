@@ -5,24 +5,13 @@ import HomeProjects from '../components/HomeProjects.astro';
 import HomeWriting from '../components/HomeWriting.astro';
 import HomeArt from '../components/HomeArt.astro';
 import Bio from '../components/Bio.astro';
-import { site } from '../data/site';
+import { graph, person, website } from '../lib/schema';
 
-const person = {
-  '@context': 'https://schema.org',
-  '@type': 'Person',
-  name: site.name,
-  alternateName: 'MVD',
-  url: site.url,
-  image: new URL('/apple-touch-icon.png', site.url).href,
-  jobTitle: 'Engineering leader',
-  description: site.description,
-  address: { '@type': 'PostalAddress', addressLocality: 'Louisville', addressRegion: 'KY', addressCountry: 'US' },
-  sameAs: Object.values(site.links),
-};
+const jsonLd = graph(website(), await person());
 ---
 
 <Base sheet="Home">
-  <script type="application/ld+json" slot="head" set:html={JSON.stringify(person)} />
+  <script type="application/ld+json" slot="head" set:html={jsonLd} />
   <Hero />
   <HomeProjects />
   <div class="pair">
