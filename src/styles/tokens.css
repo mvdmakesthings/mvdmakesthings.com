@@ -1,0 +1,78 @@
+/* Design tokens. Color comes from the bio photo; see PLAN.md, "Design tokens". */
+
+:root {
+  --paper: #fbfbf9;
+  --ink: #000000;
+  --pencil: #6b665e;
+  --copper: #a85a1c;
+  --teal: #166a72;
+  --kraft: #e9dcc4;
+  /* Darker pencil and copper for text on kraft, which fails AA with the base values. */
+  --pencil-on-kraft: #57524b;
+  --copper-on-kraft: #874613;
+  --led: #d0231b;
+  color-scheme: light;
+
+  /* Type scale, 1.25 from 18px. */
+  --step--1: 0.9rem;
+  --step-0: 1.125rem;
+  --step-1: 1.406rem;
+  --step-2: 1.758rem;
+  --step-3: 2.197rem;
+  --step-4: 2.747rem;
+  --step-5: 3.433rem;
+  --step-6: 4.292rem;
+
+  --leading: 1.55;
+  --measure: 65ch;
+  --sheet-max: 72rem;
+  --pad: 1rem;
+  --space-1: 0.5rem;
+  --space-2: 1rem;
+  --space-3: 1.5rem;
+  --space-4: 2.5rem;
+  --space-5: 4rem;
+  --radius-img: 2px;
+  --dur: 180ms;
+}
+
+@media (min-width: 48rem) {
+  :root {
+    --pad: 2rem;
+  }
+}
+
+@media (min-width: 64rem) {
+  :root {
+    --pad: 3rem;
+  }
+}
+
+/* Dark: the shop at night. Declared twice so the no-JS system preference works too. */
+:root[data-theme='dark'] {
+  --paper: #1b1814;
+  --ink: #ede9e2;
+  --pencil: #9a9389;
+  --copper: #d8873f;
+  --teal: #4fb3ba;
+  --kraft: #2a2420;
+  --pencil-on-kraft: #9a9389;
+  --copper-on-kraft: #d8873f;
+  --led: #ff4b3e;
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --paper: #1b1814;
+    --ink: #ede9e2;
+    --pencil: #9a9389;
+    --copper: #d8873f;
+    --teal: #4fb3ba;
+    --kraft: #2a2420;
+    --pencil-on-kraft: #9a9389;
+    --copper-on-kraft: #d8873f;
+    --led: #ff4b3e;
+    color-scheme: dark;
+  }
+}
