@@ -2,6 +2,18 @@
 import { defineConfig, fontProviders } from 'astro/config';
 import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
+import { readdirSync, readFileSync } from 'node:fs';
+import { parse } from 'yaml';
+
+// Last-changed date for each post URL, from frontmatter, so the sitemap can carry lastmod.
+const postDates = new Map(
+  readdirSync('src/content/writing')
+    .filter((name) => /\.mdx?$/.test(name))
+    .map((name) => {
+      const data = parse(readFileSync(`src/content/writing/${name}`, 'utf8').split(/^---$/m)[1]);
+      return [`https://mvdmakesthings.com/writing/${name.replace(/\.mdx?$/, '')}/`, data.updatedDate ?? data.pubDate];
+    }),
+);
 
 const fontsource = (pkg, file) => `./node_modules/@fontsource-variable/${pkg}/files/${file}`;
 
@@ -9,7 +21,15 @@ const fontsource = (pkg, file) => `./node_modules/@fontsource-variable/${pkg}/fi
 export default defineConfig({
   site: 'https://mvdmakesthings.com',
   trailingSlash: 'ignore',
-  integrations: [mdx(), sitemap()],
+  integrations: [
+    mdx(),
+    sitemap({
+      serialize(item) {
+        const date = postDates.get(item.url);
+        return date ? { ...item, lastmod: new Date(date).toISOString() } : item;
+      },
+    }),
+  ],
   markdown: {
     shikiConfig: {
       // Both themes are emitted as CSS variables; global.css picks one per site theme.
