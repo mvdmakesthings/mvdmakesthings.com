@@ -70,7 +70,7 @@ const imageUrl = new URL(image, Astro.site).href;
     </script>
 
     <Font cssVariable="--font-display" preload />
-    <Font cssVariable="--font-body" />
+    <Font cssVariable="--font-body" preload={[{ style: 'normal' }]} />
     <Font cssVariable="--font-mono" />
     <ClientRouter />
   </head>

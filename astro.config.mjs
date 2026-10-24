@@ -39,6 +39,9 @@ export default defineConfig({
       name: 'Newsreader',
       cssVariable: '--font-body',
       fallbacks: ['Georgia', 'serif'],
+      // Body text never swaps fonts mid-read: if Newsreader isn't ready almost at once,
+      // this page view keeps the metric-matched fallback. Avoids layout shift on slow links.
+      display: 'optional',
       options: {
         variants: [
           {
