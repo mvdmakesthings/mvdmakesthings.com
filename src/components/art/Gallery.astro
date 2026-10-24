@@ -1,6 +1,14 @@
 ---
 import { Image, getImage } from 'astro:assets';
-import { pieceMeta, type Piece } from '../../lib/art';
+import {
+  mediaAction,
+  mediaEmbed,
+  mediaLink,
+  mediaProvider,
+  mediaSummary,
+  pieceMeta,
+  type Piece,
+} from '../../lib/art';
 
 interface Props {
   pieces: Piece[];
@@ -13,19 +21,40 @@ interface Props {
 const { pieces, level = 2, preview = false } = Astro.props;
 const Heading = `h${level}` as const;
 const items = await Promise.all(
-  pieces.map(async (piece) => ({
-    piece,
-    full: await getImage({ src: piece.data.image, width: Math.min(1800, piece.data.image.width) }),
-    alt: piece.data.alt ?? piece.data.caption,
-  })),
+  pieces.map(async (piece) => {
+    const { image, media } = piece.data;
+    const alt = piece.data.alt ?? piece.data.caption;
+    return {
+      piece,
+      alt,
+      full: await getImage({ src: image, width: Math.min(1800, image.width) }),
+      // What the lightbox needs to build each player, without loading any of them.
+      media: await Promise.all(
+        media.map(async (m) => {
+          const poster = m.poster ?? image;
+          return {
+            kind: m.kind,
+            title: m.title ?? piece.data.title,
+            link: mediaLink(m),
+            embed: mediaEmbed(m),
+            provider: mediaProvider(m),
+            action: mediaAction(m),
+            poster: (await getImage({ src: poster, width: Math.min(900, poster.width) })).src,
+            alt: m.alt ?? alt,
+          };
+        }),
+      ),
+    };
+  }),
 );
 ---
 
 <ul class:list={['gallery', { preview }]} data-gallery={preview ? undefined : ''}>
   {
-    items.map(({ piece, full, alt }, index) => (
+    items.map(({ piece, full, alt, media }, index) => (
       <li class="piece">
         <a
+          class="still"
           href={preview ? `/art/#${piece.id}` : full.src}
           id={preview ? undefined : piece.id}
           data-index={index}
@@ -34,6 +63,7 @@ const items = await Promise.all(
           data-meta={pieceMeta(piece)}
           data-caption={piece.data.caption}
           data-alt={alt}
+          data-media={media.length ? JSON.stringify(media) : undefined}
         >
           <Image
             src={piece.data.image}
@@ -48,6 +78,11 @@ const items = await Promise.all(
             <div class="label">
               <Heading class="title">{piece.data.title}</Heading>
               <p class="meta">{pieceMeta(piece)}</p>
+              {media.length > 0 && (
+                <p class="meta">
+                  {mediaSummary(piece.data.media)}. <a href={media[0].link}>{media[0].action}</a>
+                </p>
+              )}
             </div>
           )
         }
@@ -61,11 +96,13 @@ const items = await Promise.all(
     <dialog class="lightbox" aria-labelledby="lightbox-title" data-lightbox>
       <div class="frame">
         <img class="lb-image" alt="" />
+        <div class="lb-stage" hidden />
       </div>
       <div class="lb-text">
         <h2 id="lightbox-title" class="lb-title" />
         <p class="meta lb-meta" />
         <p class="lb-caption" />
+        <ul class="lb-clips" aria-label="Clips" hidden />
         <p class="meta lb-count" aria-live="polite" />
       </div>
       <div class="lb-controls">
@@ -80,6 +117,23 @@ const items = await Promise.all(
 <script>
   // Lightbox: a modal <dialog>, so focus is trapped and Escape closes it natively.
   // Arrow keys and swipes move between pieces. Without JS the links open the image.
+  // Video and audio come from Instagram and SoundCloud; their players load only after
+  // the visitor presses Play, so neither service sees a visit until then.
+
+  interface MediaItem {
+    kind: 'instagram' | 'soundcloud';
+    title: string;
+    link: string;
+    embed: string;
+    provider: string;
+    action: string;
+    poster: string;
+    alt: string;
+  }
+
+  const el = <K extends keyof HTMLElementTagNameMap>(tag: K, props: Partial<HTMLElementTagNameMap[K]> = {}) =>
+    Object.assign(document.createElement(tag), props);
+
   function init() {
     const gallery = document.querySelector<HTMLElement>('[data-gallery]');
     const dialog = document.querySelector<HTMLDialogElement>('[data-lightbox]');
@@ -88,6 +142,8 @@ const items = await Promise.all(
 
     const links = [...gallery.querySelectorAll<HTMLAnchorElement>('a[data-full]')];
     const image = dialog.querySelector<HTMLImageElement>('.lb-image')!;
+    const stage = dialog.querySelector<HTMLElement>('.lb-stage')!;
+    const clips = dialog.querySelector<HTMLUListElement>('.lb-clips')!;
     const title = dialog.querySelector<HTMLElement>('.lb-title')!;
     const meta = dialog.querySelector<HTMLElement>('.lb-meta')!;
     const caption = dialog.querySelector<HTMLElement>('.lb-caption')!;
@@ -95,15 +151,62 @@ const items = await Promise.all(
     let current = 0;
     let opener: HTMLElement | null = null;
 
+    // A poster with a Play button; pressing it swaps in the provider's player.
+    const stageFor = (item: MediaItem) => {
+      const verb = item.kind === 'instagram' ? 'Play video' : 'Play audio';
+      const poster = el('img', { src: item.poster, alt: item.alt, className: 'lb-poster' });
+      const play = el('button', { type: 'button', className: 'lb-play', textContent: verb });
+      const note = el('p', { className: 'meta lb-note' });
+      note.append(`Loads ${item.provider}'s player. `, el('a', { href: item.link, textContent: item.action }));
+      play.addEventListener('click', () => {
+        const frame = el('iframe', {
+          src: item.embed,
+          title: `${item.title} on ${item.provider}`,
+          className: `lb-player ${item.kind}`,
+          allow: 'autoplay; encrypted-media; picture-in-picture',
+        });
+        stage.replaceChildren(frame, note);
+        frame.focus();
+      });
+      stage.replaceChildren(el('div', { className: 'lb-poster-wrap' }), note);
+      stage.firstElementChild!.append(poster, play);
+    };
+
+    const showClips = (media: MediaItem[], active: number) => {
+      clips.hidden = media.length < 2;
+      clips.replaceChildren(
+        ...media.map((item, i) => {
+          const button = el('button', { type: 'button', textContent: item.title });
+          if (i === active) button.setAttribute('aria-current', 'true');
+          button.addEventListener('click', () => {
+            stageFor(item);
+            showClips(media, i);
+            clips.querySelector<HTMLButtonElement>('[aria-current]')?.focus();
+          });
+          return el('li').appendChild(button).parentElement!;
+        }),
+      );
+    };
+
     const show = (index: number) => {
       current = (index + links.length) % links.length;
       const d = links[current].dataset;
-      image.src = d.full!;
-      image.alt = d.alt ?? '';
+      const media: MediaItem[] = d.media ? JSON.parse(d.media) : [];
       title.textContent = d.title ?? '';
       meta.textContent = d.meta ?? '';
       caption.textContent = d.caption ?? '';
       count.textContent = `${current + 1} of ${links.length}`;
+      image.hidden = media.length > 0;
+      stage.hidden = media.length === 0;
+      if (media.length > 0) {
+        image.removeAttribute('src');
+        stageFor(media[0]);
+      } else {
+        stage.replaceChildren();
+        image.src = d.full!;
+        image.alt = d.alt ?? '';
+      }
+      showClips(media, 0);
     };
 
     links.forEach((link, index) =>
@@ -118,11 +221,16 @@ const items = await Promise.all(
     dialog.querySelector('[data-prev]')!.addEventListener('click', () => show(current - 1));
     dialog.querySelector('[data-next]')!.addEventListener('click', () => show(current + 1));
     dialog.querySelector('[data-close]')!.addEventListener('click', () => dialog.close());
-    dialog.addEventListener('close', () => opener?.focus());
+    dialog.addEventListener('close', () => {
+      stage.replaceChildren(); // stops any playing video or audio
+      opener?.focus();
+    });
     dialog.addEventListener('click', (event) => {
       if (event.target === dialog) dialog.close();
     });
-    dialog.addEventListener('keydown', (event) => {
+    // On the document, so arrows still work if focus falls back to <body>.
+    document.addEventListener('keydown', (event) => {
+      if (!dialog.open) return;
       if (event.key === 'ArrowLeft') show(current - 1);
       if (event.key === 'ArrowRight') show(current + 1);
     });
@@ -147,7 +255,7 @@ const items = await Promise.all(
     margin: 0;
     padding: 0;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr));
     gap: var(--space-4) var(--space-3);
     align-items: start;
   }
@@ -157,7 +265,7 @@ const items = await Promise.all(
     gap: var(--space-2);
   }
 
-  .piece a {
+  .still {
     display: block;
   }
 
@@ -167,9 +275,14 @@ const items = await Promise.all(
     border: 1px solid var(--ink);
   }
 
+  /* Cards share one shape so portrait reels and square covers line up; the lightbox shows the whole frame. */
+  .piece img {
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+  }
+
   .preview .piece img {
     aspect-ratio: 1;
-    object-fit: cover;
   }
 
   .label {
@@ -183,6 +296,10 @@ const items = await Promise.all(
 
   .label .meta {
     margin: 0;
+  }
+
+  .label .meta + .meta {
+    margin-top: 0.2rem;
   }
 
   .lightbox {
@@ -218,6 +335,67 @@ const items = await Promise.all(
     border: 1px solid var(--ink);
   }
 
+  .lb-stage {
+    display: grid;
+    justify-items: center;
+    gap: var(--space-1);
+    width: 100%;
+  }
+
+  .lb-stage[hidden],
+  .lb-image[hidden] {
+    display: none;
+  }
+
+  .lb-stage :global(.lb-poster-wrap) {
+    position: relative;
+    display: grid;
+    place-items: center;
+  }
+
+  .lb-stage :global(.lb-poster) {
+    max-width: 100%;
+    max-height: 66dvh;
+    width: auto;
+    height: auto;
+    border: 1px solid var(--ink);
+  }
+
+  .lb-stage :global(.lb-play) {
+    position: absolute;
+    min-height: 2.75rem;
+    padding: 0 var(--space-2);
+    border: 1px solid var(--paper);
+    background: var(--ink);
+    color: var(--paper);
+    cursor: pointer;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: var(--step-1);
+    letter-spacing: 0.01em;
+  }
+
+  .lb-stage :global(.lb-play:hover) {
+    background: var(--copper);
+  }
+
+  .lb-stage :global(.lb-player) {
+    width: 100%;
+    max-width: 26rem;
+    height: min(66dvh, 46rem);
+    border: 1px solid var(--ink);
+    background: var(--paper);
+  }
+
+  .lb-stage :global(.lb-player.soundcloud) {
+    max-width: 40rem;
+    height: min(66dvh, 450px);
+  }
+
+  .lb-stage :global(.lb-note) {
+    margin: 0;
+  }
+
   .lb-title {
     font-size: var(--step-3);
     margin-bottom: 0.2rem;
@@ -226,6 +404,35 @@ const items = await Promise.all(
   .lb-meta,
   .lb-caption {
     margin-bottom: 0.4rem;
+  }
+
+  .lb-clips {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 0.4rem;
+    border-top: 1px solid var(--pencil);
+  }
+
+  .lb-clips :global(button) {
+    display: block;
+    width: 100%;
+    min-height: 2.75rem;
+    padding: 0.3rem 0;
+    border: 0;
+    border-bottom: 1px solid var(--pencil);
+    background: none;
+    text-align: left;
+    cursor: pointer;
+    color: var(--copper);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.18em;
+  }
+
+  .lb-clips :global(button[aria-current='true']) {
+    color: var(--ink);
+    text-decoration: none;
+    font-weight: 500;
   }
 
   .lb-count {
@@ -261,7 +468,7 @@ const items = await Promise.all(
 
   @media (min-width: 64rem) {
     .lightbox[open] {
-      grid-template-columns: minmax(0, 1fr) 18rem;
+      grid-template-columns: minmax(0, 1fr) 20rem;
       grid-template-rows: 1fr auto;
       align-items: end;
     }

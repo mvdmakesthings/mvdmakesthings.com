@@ -48,12 +48,24 @@ const art = defineCollection({
     z.object({
       title: z.string(),
       medium: z.string(),
-      year: z.number(),
+      year: z.number().optional(),
       dimensions: z.string().optional(),
       caption: z.string(),
       image: image(),
       alt: z.string().optional(),
       order: z.number().optional(),
+      // Video or audio hosted elsewhere. Players load only when a visitor presses Play.
+      media: z
+        .array(
+          z.object({
+            kind: z.enum(['instagram', 'soundcloud']),
+            url: z.url(),
+            title: z.string().optional(),
+            poster: image().optional(),
+            alt: z.string().optional(),
+          }),
+        )
+        .default([]),
     }),
 });
 
