@@ -14,6 +14,7 @@ const keep = <T,>(items: T[], key: (item: T) => string | undefined) =>
   items.filter((item) => dev || !isTodo(key(item)));
 const experience = keep(resume.experience, (job) => job.company || job.role);
 const education = keep(resume.education, (school) => school.school);
+const certifications = keep(resume.certifications, (cert) => cert.name);
 const talks = keep(resume.talks, (talk) => talk.title);
 const todo = (value?: string) => (dev && isTodo(value) ? 'todo' : undefined);
 const dates = (start?: string, end?: string) => [start, end].filter((d) => d && !(isTodo(d) && !dev)).join(' to ');
@@ -89,7 +90,7 @@ const plain = (url: string) => url.replace(/^https?:\/\/(www\.)?/, '').replace(/
           ) : (
             <ol class="timeline">
               {experience.map((job) => (
-                <li class:list={['job', todo(job.company)]}>
+                <li class:list={['job', todo(job.company), !job.print && 'no-print']}>
                   <p class="when">{dates(job.start, job.end)}</p>
                   <div>
                     <h3>{job.role}</h3>
@@ -121,6 +122,22 @@ const plain = (url: string) => url.replace(/^https?:\/\/(www\.)?/, '').replace(/
                 <li class={todo(school.school)}>
                   <strong>{school.school}</strong>
                   {[show(school.degree), show(school.year)].filter(Boolean).map((v) => `, ${v}`)}
+                </li>
+              ))}
+            </ul>
+          </section>
+        )
+      }
+
+      {
+        certifications.length > 0 && (
+          <section aria-labelledby="certifications-title">
+            <h2 id="certifications-title">Certifications</h2>
+            <ul class="plain entries">
+              {certifications.map((cert) => (
+                <li class:list={[todo(cert.name), !cert.print && 'no-print']}>
+                  {cert.url ? <a href={cert.url}>{cert.name}</a> : <strong>{cert.name}</strong>}
+                  {[show(cert.issuer), show(cert.year)].filter(Boolean).map((v) => `, ${v}`)}
                 </li>
               ))}
             </ul>
@@ -358,7 +375,21 @@ const plain = (url: string) => url.replace(/^https?:\/\/(www\.)?/, '').replace(/
     .job {
       grid-template-columns: 1.1in minmax(0, 1fr);
       padding: 0.08in 0;
+    }
+
+    /* Long jobs may split across pages, but only between lines, never right after a title. */
+    .job h3,
+    .where {
+      break-after: avoid;
+    }
+
+    .job p,
+    .job li {
       break-inside: avoid;
+    }
+
+    .job p {
+      margin-bottom: 0.04in;
     }
 
     .job h3 {

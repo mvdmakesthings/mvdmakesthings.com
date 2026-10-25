@@ -22,11 +22,15 @@ const schema = z.object({
         end: year,
         summary: text,
         highlights: z.array(z.string()).default([]),
+        print: z.boolean().default(true),
       }),
     )
     .default([]),
   skills: z.array(z.object({ group: z.string(), items: z.array(z.string()) })).default([]),
   education: z.array(z.object({ school: z.string(), degree: text, year })).default([]),
+  certifications: z
+    .array(z.object({ name: z.string(), issuer: text, year, url: text, print: z.boolean().default(true) }))
+    .default([]),
   talks: z.array(z.object({ title: z.string(), venue: text, year, url: text })).default([]),
 });
 

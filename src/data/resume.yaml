@@ -10,9 +10,10 @@ location: Louisville, Kentucky
 email: me@mjvandyke.com
 
 intro: >-
-  I lead distributed engineering teams through modernization work: moving old systems
-  into the cloud, building observability, and making decisions with data. I stay close
-  to the code.
+  I build engineering organizations that ship software into real products, and teams
+  that keep shipping after the launch hype fades. Lately that means AI rollouts that
+  earn trust instead of triggering panic, cloud migrations that make on-call less
+  miserable, and leadership where psychological safety and accountability go together.
 
 links:
   - label: LinkedIn
@@ -23,27 +24,120 @@ links:
     url: https://mvdmakesthings.com
 
 # Most recent first. Dates are free text ("2021", "Mar 2021", "Present").
+# `print: false` keeps an entry on the web page but out of the PDF.
 experience:
   - role: Sr. Director of Software Engineering
     company: Vericity, Inc.
-    location: Chicago, Illinois
+    location: Remote
     start: Jan 2026
     end: Present
-    summary: Leading four software engineering teams across two companies, eFinancial and Fidelity Life.
+    summary: >-
+      Leading four software engineering teams across eFinancial and Fidelity Life, in the
+      U.S. and Latin America, taking legacy platforms apart and moving what matters to AWS.
     highlights:
-      - Migrated legacy applications to modern AWS architectures.
-      - Stood up org-wide observability.
-      - Introduced gen-AI tooling to document legacy code and cut institutional-knowledge risk.
+      - Rolled out Claude Code to roughly 80 engineers, with the training and pilot programs that made it stick.
+      - Built an MCP server that gives our AI tools the same engineering standards our people follow.
+      - Built internal apps for time tracking and operations with Claude Code, proving engineers can make their own tools instead of waiting on a vendor.
+
+  - role: Director of Software Engineering
+    company: Fidelity Life (Vericity, Inc.)
+    location: Remote
+    start: May 2024
+    end: Dec 2025
+    summary: >-
+      Led cross-functional teams, set the software strategy, and migrated legacy
+      applications to modern AWS architectures.
+    highlights:
+      - Won Fidelity Life's Executive Choice Award (2025).
+      - Stabilized critical systems and formalized the standards teams use to build, review, test, and ship.
+      - Helped retire key legacy systems, one of the company's largest technical burdens.
+      - Stood up org-wide observability and Agile analytics, and used gen-AI to document legacy code.
+
+  - role: Sabbatical
+    company: Self-directed
+    location: Louisville, Kentucky
+    start: Nov 2023
+    end: May 2024
+    summary: >-
+      Studied AI and ML through Andrew Ng's courses. Consulted for a
+      conservation startup, mentored, and showed work in an art exhibition.
+
+  - role: Director of Engineering
+    company: Churchill Downs Inc. (TwinSpires)
+    location: Louisville, Kentucky
+    start: Feb 2022
+    end: Nov 2023
+    summary: >-
+      Led two of the highest-performing agile teams in the company: mobile engineers,
+      manual and automation QA, and scrum masters.
+    highlights:
+      - Set goals for cost, quality, and scale with marketing, product, and senior leadership.
+
+  - role: Lead Software Engineer, iOS
+    company: Churchill Downs Inc. (TwinSpires)
+    location: Louisville, Kentucky
+    start: Jun 2018
+    end: Feb 2022
+    summary: >-
+      Led the team behind the TwinSpires iOS app, the company's flagship platform: iOS,
+      QA, Java, and database engineers.
+    highlights:
+      - Held a 4.8-star average across 45,000 ratings, with hundreds of thousands of users a year.
+      - "Kept the app #1 in the App Store's Sports category."
+      - Built the CI and deployment pipelines, and set direction on architecture, UX, and technical debt.
+
+  - role: Lead Software Engineer, Front End and Architecture
+    company: Churchill Downs Inc. (TwinSpires)
+    location: Louisville, Kentucky
+    start: Sep 2017
+    end: Jun 2018
+    highlights:
+      - Prototyped native mobile options (Cordova, NativeScript, native iOS) with the architecture team.
+      - Automated builds of the hybrid iOS and Android apps, cutting dev cycle time and new-affiliate time to market.
+      - Led the analytics and events system for BI.
+      - Led multi-bonus, one of our most successful projects.
+
+  - role: Software Engineer
+    company: Churchill Downs Inc. (TwinSpires)
+    location: Louisville, Kentucky
+    start: Sep 2016
+    end: Sep 2017
+    print: false
+    summary: >-
+      Built user-facing features for the TwinSpires web app, used by millions, and wrote
+      the onboarding docs.
+
+  - role: Front-End Web Developer
+    company: DBS Interactive
+    location: Louisville, Kentucky
+    start: Nov 2014
+    end: Sep 2016
+    print: false
+    summary: >-
+      Built responsive sites, eCommerce, and hybrid apps for national and international
+      clients, and onboarded new developers.
+    highlights:
+      - Won Best Realtime Hack (1st place) at the Hack the Home hackathon with FixOfWater, a voice-controlled water dispenser.
+
+  - role: Front-End Developer
+    company: Independent contractor
+    location: Louisville, Kentucky
+    start: Nov 2012
+    end: Nov 2014
+    print: false
+    summary: Built responsive WordPress sites for small businesses and helped plan their marketing and fundraising.
 
 skills:
   - group: Leadership
     items:
       - Distributed engineering teams
+      - AI adoption and enablement
       - Legacy modernization and cloud migration
       - Observability
+      - Mentorship and career growth
       - Data-driven decision making
   - group: Engineering
-    items: [Swift and iOS, Python, TypeScript, Traditional AI and ML, AWS]
+    items: [Swift and iOS, Python, TypeScript, Claude Code and MCP, Traditional AI and ML, AWS, CI/CD]
   - group: Making
     items: [Woodworking, Electronics, Painting, Sculpture, Interactive art]
 
@@ -54,3 +148,45 @@ education:
   - school: Sullivan College of Technology and Design
     degree: Associate of Science in Computer Graphic Design
     year: 2011
+
+certifications:
+  - name: AWS Certified Cloud Practitioner
+    issuer: Amazon Web Services
+    year: 2025
+    url: https://www.credly.com/badges/e2c20d0d-d8d0-4149-8a39-e756509525b0
+  - name: Advanced Learning Algorithms
+    issuer: DeepLearning.AI and Stanford
+    year: 2024
+    url: https://www.coursera.org/account/accomplishments/records/L34PLUPBADDR
+  - name: "Supervised Machine Learning: Regression and Classification"
+    issuer: DeepLearning.AI and Stanford
+    year: 2023
+    url: https://www.coursera.org/account/accomplishments/certificate/XHF38JA8NZT4
+  - name: Setting a Foundation for Successful Test Automation
+    issuer: Test Automation University
+    year: 2023
+    url: https://testautomationu.applitools.com/certificate/?id=51653cd2
+    print: false
+  - name: Data-Driven Decision Making and Innovation
+    issuer: Udemy
+    year: 2022
+    url: https://ude.my/UC-5020be61-3acb-442e-a908-b95bac2f966a
+    print: false
+
+talks:
+  - title: On burnout and managing your energy
+    venue: LinkedIn
+    year: 2025
+    url: https://www.linkedin.com/pulse/burnout-managing-your-energy-michael-vandyke-p7ibc/
+  - title: Enhance Leadership Skills with UPR
+    venue: LinkedIn
+    year: 2024
+    url: https://www.linkedin.com/pulse/enhance-leadership-skills-upr-michael-vandyke-rnmbc/
+  - title: The Power of Pause
+    venue: LinkedIn
+    year: 2024
+    url: https://www.linkedin.com/pulse/power-pause-my-journey-over-last-6-months-michael-vandyke-hm07c/
+  - title: "Step Up, Sweat Down: A tale of team building and culture"
+    venue: LinkedIn
+    year: 2023
+    url: https://www.linkedin.com/pulse/step-up-sweat-down-tale-team-building-culture-michael-vandyke-zdjkc/
