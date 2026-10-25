@@ -2,7 +2,6 @@
 import Base from '../layouts/Base.astro';
 import Hero from '../components/Hero.astro';
 import HomeProjects from '../components/HomeProjects.astro';
-import HomeWriting from '../components/HomeWriting.astro';
 import HomeArt from '../components/HomeArt.astro';
 import Bio from '../components/Bio.astro';
 import { graph, person, website } from '../lib/schema';
@@ -14,26 +13,16 @@ const jsonLd = graph(website(), await person());
   <script type="application/ld+json" slot="head" set:html={jsonLd} />
   <Hero />
   <HomeProjects />
-  <div class="pair">
-    <HomeWriting />
+  <div class="art">
     <HomeArt />
   </div>
   <Bio />
 </Base>
 
 <style>
-  .pair {
-    display: grid;
-    gap: var(--space-4);
+  .art {
     margin-top: var(--space-5);
     padding-top: var(--space-4);
     border-top: 1px solid var(--ink);
-  }
-
-  @media (min-width: 64rem) {
-    .pair {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: var(--space-5);
-    }
   }
 </style>

@@ -29,18 +29,6 @@ const projects = defineCollection({
   }),
 });
 
-const writing = defineCollection({
-  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/writing' }),
-  schema: z.object({
-    title: z.string(),
-    description: z.string(),
-    pubDate: z.coerce.date(),
-    updatedDate: z.coerce.date().optional(),
-    tags: z.array(z.string()).default([]),
-    draft: z.boolean().default(false),
-  }),
-});
-
 // One YAML file per piece, with its image beside it in src/content/art/.
 const art = defineCollection({
   loader: glob({ pattern: '*.{yaml,yml}', base: './src/content/art' }),
@@ -69,4 +57,4 @@ const art = defineCollection({
     }),
 });
 
-export const collections = { projects, writing, art };
+export const collections = { projects, art };

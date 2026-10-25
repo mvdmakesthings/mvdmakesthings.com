@@ -3,7 +3,6 @@
 import { getImage } from 'astro:assets';
 import photo from '../../assets/bio-photo.jpg';
 import { site } from '../data/site';
-import type { Post } from './writing';
 
 const abs = (path: string) => new URL(path, site.url).href;
 
@@ -37,22 +36,6 @@ export const website = () => ({
   description: site.description,
   inLanguage: 'en-US',
   publisher: { '@id': personId },
-});
-
-export const blogPosting = (post: Post, url: string, image: string) => ({
-  '@type': 'BlogPosting',
-  headline: post.data.title,
-  description: post.data.description,
-  url: abs(url),
-  mainEntityOfPage: abs(url),
-  image: abs(image),
-  datePublished: post.data.pubDate.toISOString(),
-  dateModified: (post.data.updatedDate ?? post.data.pubDate).toISOString(),
-  keywords: post.data.tags.join(', ') || undefined,
-  inLanguage: 'en-US',
-  author: { '@type': 'Person', '@id': personId, name: site.name, url: site.url },
-  publisher: { '@id': personId },
-  isPartOf: { '@id': websiteId },
 });
 
 /** The resume page is a profile of Michael. */

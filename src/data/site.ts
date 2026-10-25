@@ -11,7 +11,7 @@ export const site = {
   title: 'MVD Makes Things',
   url: 'https://mvdmakesthings.com',
   description:
-    'Michael VanDyke (MVD) is a software engineering leader, visual artist, and lifelong maker in Louisville, Kentucky. Projects, writing, art, and resume.',
+    'Michael VanDyke (MVD) is a software engineering leader, visual artist, and lifelong maker in Louisville, Kentucky. Projects, art, and resume.',
   location: 'Louisville, Kentucky',
   email: 'me@mjvandyke.com',
   source: 'https://github.com/mvdmakesthings/mvdmakesthings.com',
@@ -23,7 +23,6 @@ export const site = {
   },
   nav: [
     { href: '/projects/', label: 'Projects' },
-    { href: '/writing/', label: 'Writing' },
     { href: '/art/', label: 'Art' },
     { href: '/resume/', label: 'Resume' },
   ] satisfies NavItem[],

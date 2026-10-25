@@ -1,13 +1,12 @@
 # mvdmakesthings.com
 
 Source for [mvdmakesthings.com](https://mvdmakesthings.com), Michael VanDyke's maker hub:
-projects, writing, art, and a resume. The home page opens on an exploded-view drawing of a
+projects, art, and a resume. The home page opens on an exploded-view drawing of a
 TV remote that you take apart with your pointer (or by scrolling on a phone). Its power
 button switches the theme.
 
 Static [Astro](https://astro.build) site, plain CSS, a little vanilla TypeScript, hosted on
-Vercel. [How this site is built](https://mvdmakesthings.com/writing/how-this-site-is-built/)
-explains the design; `PLAN.md` is the original brief.
+Vercel. `PLAN.md` is the original brief.
 
 ## Commands
 
@@ -59,27 +58,6 @@ everything else; nothing is pulled from GitHub automatically.
   run `pnpm thumbnails my-thing` to screenshot it at 1200×750. Or drop any 16:10 image into
   `src/assets/projects/`. Without an `image`, the entry gets a typographic cover.
 - **Private repos:** leave out `source`, since visitors would get a 404.
-
-### Write a post
-
-Add an `.mdx` (or `.md`) file to `src/content/writing/`. The filename becomes the URL:
-`src/content/writing/shop-notes.mdx` publishes at `/writing/shop-notes/`.
-
-```mdx
----
-title: Shop notes
-description: One sentence for the list, RSS, and link previews.
-pubDate: 2026-11-01
-updatedDate: 2026-11-03   # optional
-tags: [woodworking]
-draft: true               # optional; drafts show only in pnpm dev
----
-
-Write here. Fenced code blocks are highlighted. For images, put the file next to the
-post and write ![Alt text](./photo.jpg) so it gets resized.
-```
-
-Posts show up on `/writing/`, in the latest three on the home page, and in `/rss.xml`.
 
 ### Add an art piece
 
@@ -138,8 +116,7 @@ is public, so put nothing in the file you wouldn't put on LinkedIn.
 
 - **Email:** set `email: 'you@example.com'` to add a mailto link to the bio and footer.
   The resume has its own optional `email` in `resume.yaml`.
-- **Hide a nav item** (for example Writing until there's a second post): remove it from
-  the `nav` array. The page itself stays published.
+- **Hide a nav item:** remove it from the `nav` array. The page itself stays published.
 - **Bio:** the paragraphs are in `src/components/Bio.astro`; the photo is `assets/bio-photo.jpg`.
 
 ## Where things are
@@ -148,14 +125,13 @@ is public, so put nothing in the file you wouldn't put on LinkedIn.
 assets/bio-photo.jpg           bio photo (the OG image and touch icon are crops of it)
 public/                        favicon, og.jpg, robots.txt, resume.pdf
 scripts/                       capture-thumbnails.ts, resume-pdf.ts
-src/content.config.ts          schemas for projects, writing, and art
-src/content/writing/           posts
+src/content.config.ts          schemas for projects and art
 src/content/art/               gallery pieces (YAML + image)
 src/data/                      site.ts, projects.yaml, resume.yaml
 src/components/Teardown.astro  the remote: geometry, interaction script, styles
 src/lib/axo.ts                 the build-time axonometric drawing helpers
 src/styles/tokens.css          colors, type scale, spacing
-src/styles/global.css          base styles, code blocks, print rules
+src/styles/global.css          base styles, print rules
 tests/smoke.spec.ts            Playwright + axe
 ```
 

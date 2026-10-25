@@ -5,7 +5,7 @@ import { parse } from 'yaml';
 
 const featuredCount = (parse(readFileSync('src/data/projects.yaml', 'utf8')) as unknown[]).length;
 
-const pages = ['/', '/projects/', '/writing/', '/writing/how-this-site-is-built/', '/art/', '/resume/', '/404/'];
+const pages = ['/', '/projects/', '/art/', '/resume/', '/404/'];
 
 const explode = (page: Page) =>
   page.locator('[data-teardown]').evaluate((el) => Number(getComputedStyle(el).getPropertyValue('--explode')));
@@ -22,7 +22,6 @@ test('main navigation reaches every section', async ({ page, isMobile }) => {
   await page.goto('/');
   for (const [label, path, heading] of [
     ['Projects', '/projects/', 'Projects'],
-    ['Writing', '/writing/', 'Writing'],
     ['Art', '/art/', 'Art'],
     ['Resume', '/resume/', 'Michael VanDyke'],
   ]) {

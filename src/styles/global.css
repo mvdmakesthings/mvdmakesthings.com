@@ -169,10 +169,6 @@ main {
   padding: var(--space-4) var(--pad) var(--space-5);
 }
 
-.prose {
-  max-width: var(--measure);
-}
-
 .lede {
   font-size: var(--step-1);
   line-height: 1.4;
@@ -217,34 +213,6 @@ main {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
-}
-
-/* Code blocks. Shiki emits both themes as variables; pick one per site theme. */
-.astro-code,
-.astro-code span {
-  color: var(--shiki-light);
-}
-
-:root[data-theme='dark'] .astro-code,
-:root[data-theme='dark'] .astro-code span {
-  color: var(--shiki-dark);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme='light']) .astro-code,
-  :root:not([data-theme='light']) .astro-code span {
-    color: var(--shiki-dark);
-  }
-}
-
-pre.astro-code {
-  background: var(--paper);
-  border: 1px solid var(--pencil);
-  padding: var(--space-2);
-  overflow-x: auto;
-  line-height: 1.5;
-  font-size: 0.8rem;
-  tab-size: 2;
 }
 
 :not(pre) > code {

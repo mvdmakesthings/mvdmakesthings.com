@@ -12,7 +12,6 @@ const rev = new Date().toISOString().slice(0, 10);
 <footer class="site-footer" transition:animate="none">
   <ul class="links" aria-label="Elsewhere">
     {socialLinks.map((link) => <li><a href={link.href}>{link.label}</a></li>)}
-    <li><a href="/rss.xml">RSS</a></li>
     {site.email && <li><a href={`mailto:${site.email}`}>Email</a></li>}
   </ul>
 
