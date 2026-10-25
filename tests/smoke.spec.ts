@@ -12,7 +12,7 @@ const explode = (page: Page) =>
 
 test('home renders the hero and the catalog', async ({ page }) => {
   await page.goto('/');
-  await expect(page.getByRole('heading', { level: 1 })).toContainText('I take things apart');
+  await expect(page.getByRole('heading', { level: 1 })).toContainText('I make software, art');
   await expect(page.getByRole('img', { name: /Exploded view of a TV remote/ })).toBeVisible();
   await expect(page.locator('#made-title + ul > li')).toHaveCount(featuredCount);
   await expect(page.getByRole('link', { name: 'Work with me' }).first()).toHaveAttribute('href', '/resume/');

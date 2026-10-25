@@ -80,8 +80,8 @@ patent drawings, iFixit teardowns, exploded assembly diagrams in tool catalogs.
 
 Headline beside it, in first person:
 
-> I take things apart to see how they work.
-> Then I make new ones.
+> I make software, art, and the occasional mess.
+> Usually in that order.
 
 Subline: "Michael VanDyke. Engineering leader, artist, and lifelong maker in
 Louisville, Kentucky." Two links: "See what I've made" (Projects) and "Work with me"
@@ -172,9 +172,9 @@ Home page wireframe (desktop):
 │ MVD                               Projects  Writing  Art  Resume ◐ │
 ├──────────────────────────────────────────────────────────────────┤
 │                                                                  │
-│  I take things apart               ┌───────────────────────┐     │
-│  to see how they work.             │  exploded remote      │     │
-│  Then I make new ones.             │  (parts spread along  │     │
+│  I make software, art,             ┌───────────────────────┐     │
+│  and the occasional mess.          │  exploded remote      │     │
+│  Usually in that order.            │  (parts spread along  │     │
 │                                    │   the y axis as the   │     │
 │  Michael VanDyke. Engineering      │   pointer moves;      │     │
 │  leader, artist, and lifelong      │   callouts label      │     │
