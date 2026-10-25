@@ -25,8 +25,10 @@ const TYPES: Record<string, string> = {
 execSync('pnpm exec astro build', { stdio: 'inherit' });
 
 const server = createServer(async (request, response) => {
-  let path = normalize(decodeURIComponent(new URL(request.url ?? '/', 'http://x').pathname));
-  if (path.endsWith('/')) path += 'index.html';
+  // Add index.html before normalizing: on Windows, normalize turns the trailing / into \.
+  let pathname = decodeURIComponent(new URL(request.url ?? '/', 'http://x').pathname);
+  if (pathname.endsWith('/')) pathname += 'index.html';
+  const path = normalize(pathname);
   try {
     const body = await readFile(join(DIST, path));
     response.writeHead(200, { 'Content-Type': TYPES[extname(path)] ?? 'application/octet-stream' });
