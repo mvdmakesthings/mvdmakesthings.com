@@ -68,7 +68,7 @@ experience:
     start: Feb 2022
     end: Nov 2023
     summary: >-
-      Led two of the highest-performing agile teams in the company: mobile engineers,
+      Built and led two of the highest-performing agile teams in the company: mobile engineers,
       manual and automation QA, and scrum masters.
     highlights:
       - Set goals for cost, quality, and scale with marketing, product, and senior leadership.
@@ -139,7 +139,7 @@ skills:
   - group: Engineering
     items: [Swift and iOS, Python, TypeScript, Claude Code and MCP, Traditional AI and ML, AWS, CI/CD]
   - group: Making
-    items: [Woodworking, Electronics, Painting, Sculpture, Interactive art]
+    items: [Woodworking, Electronics, Painting, Interactive art]
 
 education:
   - school: Sullivan College of Technology and Design
@@ -172,21 +172,3 @@ certifications:
     year: 2022
     url: https://ude.my/UC-5020be61-3acb-442e-a908-b95bac2f966a
     print: false
-
-talks:
-  - title: On burnout and managing your energy
-    venue: LinkedIn
-    year: 2025
-    url: https://www.linkedin.com/pulse/burnout-managing-your-energy-michael-vandyke-p7ibc/
-  - title: Enhance Leadership Skills with UPR
-    venue: LinkedIn
-    year: 2024
-    url: https://www.linkedin.com/pulse/enhance-leadership-skills-upr-michael-vandyke-rnmbc/
-  - title: The Power of Pause
-    venue: LinkedIn
-    year: 2024
-    url: https://www.linkedin.com/pulse/power-pause-my-journey-over-last-6-months-michael-vandyke-hm07c/
-  - title: "Step Up, Sweat Down: A tale of team building and culture"
-    venue: LinkedIn
-    year: 2023
-    url: https://www.linkedin.com/pulse/step-up-sweat-down-tale-team-building-culture-michael-vandyke-zdjkc/
