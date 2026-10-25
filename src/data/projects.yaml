@@ -13,6 +13,33 @@
 # TODO(Michael): tighten the summaries, and add why you built each one and what
 # you learned to its spec. Specs below only state what the repos say.
 
+- slug: refinery-hair-lounge
+  title: The Refinery Hair Lounge
+  summary: A custom WordPress theme for a Louisville salon with more than one location. Stylists run their own profiles, and the owner can see whose profile brings in bookings.
+  stack: [WordPress, PHP, Secure Custom Fields, GitHub Actions, Terraform, AWS Lightsail, Playwright]
+  status: client
+  links:
+    live: https://therefineryhairlounge.com
+  image: refinery-hair-lounge.png
+  spec: |
+    Client work, built from scratch. Each stylist has a profile with a headshot,
+    bio, socials, online booking, and whether they are taking new clients. New
+    stylists get an onboarding email, fill in their own profile, and it goes
+    through a review step before it is published.
+
+    Locations are a taxonomy, so one stylist can work at several, and each location
+    has its own landing page. Service pages, a Google Reviews carousel, schema
+    markup, and an llms.txt round out the public side.
+
+    An admin-only booking leaderboard ranks stylists by Book clicks, next to profile
+    views and click rate, so the owner can see whose profile turns visitors into
+    bookings.
+
+    Staging and production deploy from GitHub Actions as atomic releases with a
+    one-step rollback, on AWS Lightsail defined in Terraform. Playwright and PHPUnit
+    tests cover both the public site and the admin.
+
+
 - slug: groundwerk
   title: Groundwerk
   summary: AI strategy tools for founders. Each one interviews you, pushes back on thin answers, and writes a document that has passed its own quality gates.
@@ -49,18 +76,3 @@
   spec: |
     Built to do two jobs: a practical library for iOS and macOS apps that track
     satellites, and a teaching tool for learning orbital mechanics by reading the code.
-
-
-- slug: refinery-hair-lounge
-  title: The Refinery Hair Lounge
-  summary: A custom WordPress site for a Louisville hair salon, with a stylist directory the salon manages itself and a pipeline that deploys it.
-  stack: [WordPress, PHP, Secure Custom Fields, GitHub Actions, Terraform]
-  status: client
-  links:
-    live: https://therefineryhairlounge.com
-  image: refinery-hair-lounge.png
-  spec: |
-    Client work. A dark, editorial theme built from scratch around a stylist
-    custom post type: headshot, bio, contact details, socials, online booking,
-    and whether they are taking new clients. Staging and production deploy from
-    GitHub Actions, with the hosting defined in Terraform.
