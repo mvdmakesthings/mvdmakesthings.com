@@ -7,7 +7,7 @@
 name: Michael VanDyke
 title: Technology strategist. People-first leader.
 location: Louisville, Kentucky
-# email: you@example.com   # TODO(Michael): optional; also set `email` in src/data/site.ts
+email: me@mjvandyke.com
 
 intro: >-
   I lead distributed engineering teams through modernization work: moving old systems
@@ -24,21 +24,16 @@ links:
 
 # Most recent first. Dates are free text ("2021", "Mar 2021", "Present").
 experience:
-  - role: TODO Role title
-    company: TODO Company
-    location: TODO City, State or Remote
-    start: TODO
+  - role: Sr. Director of Software Engineering
+    company: Vericity, Inc.
+    location: Chicago, Illinois
+    start: Jan 2026
     end: Present
-    summary: TODO One sentence on the scope of the job (team size, systems, budget).
+    summary: Leading four software engineering teams across two companies, eFinancial and Fidelity Life.
     highlights:
-      - TODO An outcome, with a number if you have one.
-      - TODO Another outcome.
-  - role: TODO Previous role
-    company: TODO Company
-    start: TODO
-    end: TODO
-    highlights:
-      - TODO An outcome.
+      - Migrated legacy applications to modern AWS architectures.
+      - Stood up org-wide observability.
+      - Introduced gen-AI tooling to document legacy code and cut institutional-knowledge risk.
 
 skills:
   - group: Leadership
@@ -53,13 +48,9 @@ skills:
     items: [Woodworking, Electronics, Painting, Sculpture, Interactive art]
 
 education:
-  - school: TODO School
-    degree: TODO Degree
-    year: TODO
-
-# Talks, writing, or recognition worth listing. Delete the TODO entry if none.
-talks:
-  - title: TODO Talk or article title
-    venue: TODO Where
-    year: TODO
-    url: # optional
+  - school: Sullivan College of Technology and Design
+    degree: Associate in Dynamic Web Development
+    year: 2013
+  - school: Sullivan College of Technology and Design
+    degree: Associate of Science in Computer Graphic Design
+    year: 2011

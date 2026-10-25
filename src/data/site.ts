@@ -13,8 +13,7 @@ export const site = {
   description:
     'Michael VanDyke (MVD) is a software engineering leader, visual artist, and lifelong maker in Louisville, Kentucky. Projects, writing, art, and resume.',
   location: 'Louisville, Kentucky',
-  // TODO(Michael): set a contact address to show a mailto link in the bio and footer.
-  email: undefined as string | undefined,
+  email: 'me@mjvandyke.com',
   source: 'https://github.com/mvdmakesthings/mvdmakesthings.com',
   links: {
     github: 'https://github.com/mvdmakesthings',
